@@ -1,13 +1,21 @@
 import { Spinner } from "@std/cli/unstable-spinner";
 import { intersect } from "@std/collections/intersect";
-import type { GitHubAdvisories, Package, RunAudit } from "./types.ts";
-import { fallback, inferSeverities, writeFileToOutDir } from "./util.ts";
+import type { GitHubAdvisories, Package, RunAudit, Severity } from "./types.ts";
 import { Api } from "./api.ts";
+
+const inferSeverities = (severity: Severity): Severity[] => {
+  if (severity === "critical") return ["critical"];
+  if (severity === "high") return ["high", "critical"];
+  if (severity === "moderate") return ["moderate", "high", "critical"];
+  return ["low", "moderate", "high", "critical"];
+};
 
 const createReport = (packageAdvisories: {
   pkg: Package;
   advisories: GitHubAdvisories;
 }[]): string => {
+  const fallback = "N/A";
+
   return [
     "# Audit report (JSR)",
     "",
@@ -46,7 +54,11 @@ const createReport = (packageAdvisories: {
   ].join("\n");
 };
 
-export const auditJsr: RunAudit = async (packages, { severity, silent }) => {
+/** @internal*/
+export const auditJsr: RunAudit = async (
+  packages,
+  { severity, silent, outputDir },
+) => {
   if (packages.length > 0) {
     const spinner = new Spinner({
       message: "Running JSR audit...",
@@ -82,7 +94,8 @@ export const auditJsr: RunAudit = async (packages, { severity, silent }) => {
     if (packageAdvisories.length > 0) {
       const reportString = createReport(packageAdvisories);
 
-      writeFileToOutDir("audit-jsr-report.md", reportString);
+      Deno.writeTextFileSync(`${outputDir}/audit-jsr-report.md`, reportString);
+
       if (!silent) console.info(`\n${reportString}`);
 
       const severitiesToInclude = inferSeverities(severity);

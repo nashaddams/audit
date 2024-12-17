@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import { type Stub, stub } from "@std/testing/mock";
 import { assertSnapshot } from "@std/testing/snapshot";
 import { audit } from "../mod.ts";
-import { OUT_DIR } from "../src/util.ts";
 import { Api } from "../src/api.ts";
 import { Cmd } from "../src/cmd.ts";
 import { githubAdvisories } from "./mock/github-advisories.ts";
@@ -35,7 +34,7 @@ describe("audit", () => {
     });
     await assertSnapshot(
       t,
-      Deno.readTextFileSync(`${OUT_DIR}/audit-jsr-report.md`),
+      Deno.readTextFileSync(".audit/audit-jsr-report.md"),
       {
         name: "JSR only",
         path: `${import.meta.dirname}/__snapshots__/jsr-only.snap`,
@@ -58,7 +57,7 @@ describe("audit", () => {
 
     await assertSnapshot(
       t,
-      Deno.readTextFileSync(`${OUT_DIR}/audit-npm-report.md`),
+      Deno.readTextFileSync(".audit/audit-npm-report.md"),
       {
         name: "NPM only",
         path: `${import.meta.dirname}/__snapshots__/npm-only.snap`,
@@ -81,7 +80,7 @@ describe("audit", () => {
 
     await assertSnapshot(
       t,
-      Deno.readTextFileSync(`${OUT_DIR}/audit-npm-report.md`),
+      Deno.readTextFileSync(".audit/audit-npm-report.md"),
       {
         name: "ESM only",
         path: `${import.meta.dirname}/__snapshots__/esm-only.snap`,
@@ -104,7 +103,7 @@ describe("audit", () => {
 
     await assertSnapshot(
       t,
-      Deno.readTextFileSync(`${OUT_DIR}/audit-jsr-report.md`),
+      Deno.readTextFileSync(".audit/audit-jsr-report.md"),
       {
         name: "All (JSR)",
         path: `${import.meta.dirname}/__snapshots__/all.snap`,
@@ -113,7 +112,7 @@ describe("audit", () => {
 
     await assertSnapshot(
       t,
-      Deno.readTextFileSync(`${OUT_DIR}/audit-npm-report.md`),
+      Deno.readTextFileSync(".audit/audit-npm-report.md"),
       {
         name: "All (NPM/ESM)",
         path: `${import.meta.dirname}/__snapshots__/all.snap`,

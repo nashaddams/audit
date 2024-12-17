@@ -1,5 +1,8 @@
 # audit
 
+[![JSR](https://jsr.io/badges/@nashaddams/audit)](https://jsr.io/@nashaddams/audit)
+[![main](https://github.com/nashaddams/audit/actions/workflows/tests.yml/badge.svg)](https://github.com/nashaddams/audit/actions)
+
 A tool for auditing [JSR](https://jsr.io/), [NPM](https://www.npmjs.com/), and
 [ESM](https://esm.sh/) packages with [Deno](https://deno.com/) utilizing the
 [GitHub Advisory Database](https://github.com/advisories) and
@@ -25,3 +28,7 @@ deno run https://jsr.io/@nashaddams/audit/<version>/mod.ts --help # Print option
 
 deno run -RW -N=api.jsr.io,api.github.com --allow-run=npm https://jsr.io/@nashaddams/audit/<version>/mod.ts
 ```
+
+Running this command will print the audit results to the console, create a
+report in the output directory, and return an exit code indicating if
+vulnerabilities have been found (`1`) or not (`0`).
