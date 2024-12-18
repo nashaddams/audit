@@ -1,6 +1,7 @@
 import { Spinner } from "@std/cli/unstable-spinner";
 import type { NpmAuditResult, Package, RunAudit } from "./types.ts";
 import { Cmd } from "./cmd.ts";
+import { File } from "./file.ts";
 
 const createPackageJson = (packages: Package[]): string => {
   return [
@@ -20,13 +21,13 @@ const createReport = (npmAuditResult: NpmAuditResult): string => {
   const fallback = "N/A";
 
   return [
-    "# Audit report (NPM/ESM)",
+    "\n## NPM/ESM",
     "",
     npmAuditResult.vulnerabilities
       ? Object.values(npmAuditResult.vulnerabilities).flatMap(
         (vulnerability) => {
           return [
-            `## ${vulnerability.name ?? fallback}`,
+            `### ${vulnerability.name ?? fallback}`,
             "",
             `Severity: ${
               vulnerability.severity ?? fallback
@@ -78,10 +79,7 @@ export const auditNpm: RunAudit = async (
     spinner.start();
     await new Promise((r) => setTimeout(r, 182)); // Ensure spinner is shown
 
-    Deno.writeTextFileSync(
-      `${outputDir}/package.json`,
-      createPackageJson(packages),
-    );
+    File.writePackageJson(outputDir, createPackageJson(packages));
 
     const { stderr: stderrInstall } = Cmd.npmInstall({ outputDir });
 
@@ -102,11 +100,12 @@ export const auditNpm: RunAudit = async (
       ) {
         const report = createReport(auditJson);
 
-        Deno.writeTextFileSync(`${outputDir}/audit-npm-report.md`, report);
+        File.writeReport(outputDir, report);
+        File.writeReportHtml(outputDir, report);
 
-        if (!silent) console.info(`\n${report}`);
+        if (!silent) console.info(report);
       } else {
-        if (!silent) console.info("No vulnerabilities found.");
+        if (!silent) console.info("\nNo vulnerabilities found.");
       }
     }
 

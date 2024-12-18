@@ -26,9 +26,26 @@ NPM and ESM packages are injected into a generated `package.json` file on which
 ```sh
 deno run https://jsr.io/@nashaddams/audit/<version>/mod.ts --help # Print options
 
-deno run -RW -N=api.jsr.io,api.github.com --allow-run=npm https://jsr.io/@nashaddams/audit/<version>/mod.ts
+deno run \
+  -RWE -N=api.jsr.io,api.github.com --allow-run=npm \
+  https://jsr.io/@nashaddams/audit/<version>/mod.ts
 ```
 
 Running this command will print the audit results to the console, create a
 report in the output directory, and return an exit code indicating if
 vulnerabilities have been found (`1`) or not (`0`).
+
+### HTML report
+
+```sh
+deno run \
+  -RE -N=0.0.0.0 \
+  https://jsr.io/@nashaddams/audit/<version>/mod.ts \
+  report
+```
+
+## Testing
+
+```sh
+deno task test
+```

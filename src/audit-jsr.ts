@@ -2,6 +2,7 @@ import { Spinner } from "@std/cli/unstable-spinner";
 import { intersect } from "@std/collections/intersect";
 import type { GitHubAdvisories, Package, RunAudit, Severity } from "./types.ts";
 import { Api } from "./api.ts";
+import { File } from "./file.ts";
 
 const inferSeverities = (severity: Severity): Severity[] => {
   if (severity === "critical") return ["critical"];
@@ -17,11 +18,11 @@ const createReport = (packageAdvisories: {
   const fallback = "N/A";
 
   return [
-    "# Audit report (JSR)",
+    "\n## JSR",
     "",
     packageAdvisories.flatMap(({ pkg, advisories }) => {
       return [
-        `## ${pkg.name} (${pkg.version})`,
+        `### ${pkg.name} (${pkg.version})`,
         "",
         advisories.flatMap((advisory) => {
           return [
@@ -94,9 +95,10 @@ export const auditJsr: RunAudit = async (
     if (packageAdvisories.length > 0) {
       const reportString = createReport(packageAdvisories);
 
-      Deno.writeTextFileSync(`${outputDir}/audit-jsr-report.md`, reportString);
+      File.writeReport(outputDir, reportString);
+      File.writeReportHtml(outputDir, reportString);
 
-      if (!silent) console.info(`\n${reportString}`);
+      if (!silent) console.info(reportString);
 
       const severitiesToInclude = inferSeverities(severity);
       const severities = packageAdvisories.flatMap(({ advisories }) =>
@@ -107,7 +109,7 @@ export const auditJsr: RunAudit = async (
         return 1;
       }
     } else {
-      if (!silent) console.info("No vulnerabilities found.");
+      if (!silent) console.info("\nNo vulnerabilities found.");
     }
   }
 
