@@ -96,7 +96,6 @@ export const auditJsr: RunAudit = async (
       const reportString = createReport(packageAdvisories);
 
       File.writeReport(outputDir, reportString);
-      File.writeReportHtml(outputDir, reportString);
 
       if (!silent) console.info(reportString);
 

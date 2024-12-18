@@ -2,16 +2,19 @@ import { CSS, render } from "@deno/gfm";
 
 /** @internal*/
 export const File = {
-  writePackageJson: (outputDir: string, data: string) => {
+  writePackageJson: (outputDir: string, data: string): void => {
     Deno.writeTextFileSync(`${outputDir}/package.json`, data);
   },
-  writeReport: (outputDir: string, data: string) => {
+  writeReport: (outputDir: string, data: string): void => {
     Deno.writeTextFileSync(`${outputDir}/report.md`, data, { append: true });
   },
-  writeReportHtml: (outputDir: string, data: string) => {
-    Deno.writeTextFileSync(
-      `${outputDir}/report.html`,
-      `
+  generateHtmlReport: (outputDir: string): void => {
+    try {
+      const auditMd = Deno.readTextFileSync(`${outputDir}/report.md`);
+
+      Deno.writeTextFileSync(
+        `${outputDir}/report.html`,
+        `
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -25,14 +28,17 @@ export const File = {
       ${CSS}
     </style>
   </head>
-  <body>
-    <main data-color-mode="light" data-light-theme="light" data-dark-theme="dark" class="markdown-body">
-      ${render(data)}
+  <body data-color-mode="auto" data-light-theme="light" data-dark-theme="dark" class="markdown-body">
+    <main>
+      ${render(auditMd)}
     </main>
   </body>
 </html>
-    `,
-      { append: true },
-    );
+      `,
+      );
+    } catch (err) {
+      if (!(err instanceof Deno.errors.NotFound)) throw err;
+      console.info(`No audit report found at ${outputDir}/report.md`);
+    }
   },
 };
