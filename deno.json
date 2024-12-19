@@ -17,7 +17,8 @@
     "build": "deno compile -RWE -N=api.jsr.io,api.github.com,0.0.0.0 --allow-run=\"npm\" -o dist/audit mod.ts",
     "audit": "deno run -RWE -N=api.jsr.io,api.github.com --allow-run=\"npm\" mod.ts",
     "report": "deno run -RE -N=0.0.0.0 mod.ts report",
-    "test": "deno test -RW --allow-run=\"npm\"",
+    "test": "deno test -RW -N=api.jsr.io,api.github.com --coverage=cov",
+    "coverage": "deno coverage --lcov cov > cov.lcov && deno coverage cov",
     "doc": "deno doc --html mod.ts"
   },
   "lock": false
