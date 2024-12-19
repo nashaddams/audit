@@ -8,7 +8,7 @@ A tool for auditing [JSR](https://jsr.io/), [NPM](https://www.npmjs.com/), and
 [GitHub Advisory Database](https://github.com/advisories) and
 [`npm audit`](https://docs.npmjs.com/cli/commands/npm-audit).
 
-The packages are extracted from a given `deno.lock` file.
+The packages are extracted from a given `deno.lock` (v4) file.
 
 ## JSR packages
 
@@ -42,10 +42,4 @@ deno run \
   -RE -N=0.0.0.0 \
   https://jsr.io/@nashaddams/audit/<version>/mod.ts \
   report
-```
-
-## Testing
-
-```sh
-deno task test
 ```
