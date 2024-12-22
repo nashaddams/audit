@@ -6,7 +6,7 @@ import { File } from "./file.ts";
 const createPackageJson = (packages: Package[]): string => {
   return [
     "{",
-    '  "dependencies": {',
+    '  "optionalDependencies": {',
     packages.flatMap(({ name, version }, i, arr) => {
       return [
         `    "${name}": "${version}"${i !== arr.length - 1 ? "," : ""}`,
@@ -66,7 +66,7 @@ const createReport = (npmAuditResult: NpmAuditResult): string => {
   ].join("\n");
 };
 
-/** @internal*/
+/** @internal */
 export const auditNpm: RunAudit = async (
   packages,
   { severity, silent, outputDir },
