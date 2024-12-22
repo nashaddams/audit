@@ -55,7 +55,7 @@ const createReport = (packageAdvisories: {
   ].join("\n");
 };
 
-/** @internal*/
+/** @internal */
 export const auditJsr: RunAudit = async (
   packages,
   { severity, silent, outputDir },

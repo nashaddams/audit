@@ -1,6 +1,6 @@
 import { CSS, render } from "@deno/gfm";
 
-/** @internal*/
+/** @internal */
 export const File = {
   writePackageJson: (outputDir: string, data: string): void => {
     Deno.writeTextFileSync(`${outputDir}/package.json`, data);
