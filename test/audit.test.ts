@@ -28,9 +28,16 @@ describe("audit", () => {
   });
 
   afterEach(() => {
-    fetchAdvisoriesStub?.restore();
-    npmInstallStub?.restore();
-    npmAuditStub?.restore();
+    if (fetchAdvisoriesStub && !fetchAdvisoriesStub.restored) {
+      fetchAdvisoriesStub.restore();
+    }
+    if (npmInstallStub && !npmInstallStub.restored) {
+      npmInstallStub.restore();
+    }
+    if (npmAuditStub && !npmAuditStub.restored) {
+      npmAuditStub.restore();
+    }
+    Deno.removeSync(".audit", { recursive: true });
   });
 
   it("should audit JSR packages", async (t) => {
@@ -39,6 +46,7 @@ describe("audit", () => {
       severity: "low",
       silent: true,
     });
+
     await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {
       name: "JSR only",
       path: `${import.meta.dirname}/__snapshots__/jsr-only.snap`,
