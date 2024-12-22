@@ -17,6 +17,15 @@ const formatKeys = (keys: string[]): string => {
 
 const inferNameAndVersion = (key: string): Package => {
   const splitPos = key.lastIndexOf("@");
+
+  // Missing version
+  if (splitPos === -1) {
+    return {
+      name: key,
+      version: undefined,
+    };
+  }
+
   return {
     name: key.slice(0, splitPos),
     version: key.slice(splitPos + 1).split("/")[0],
@@ -33,14 +42,18 @@ const normalizeEsmKeys = (keys: string[]): Package[] => {
   return deduplicate(keys.map((key) => {
     const { pathname } = new URL(key);
     const { name, version } = inferNameAndVersion(pathname);
+
+    // ESM keys may contain url artifacts like `/stable/`, `/v135/`
+    const sanitizedName = name.replace(/\/v([0-9]+)|\/stable/g, "");
+
     return {
-      name: name.slice(name.lastIndexOf("/") + 1),
+      name: sanitizedName.slice(1),
       version,
     };
   }));
 };
 
-/** @internal*/
+/** @internal */
 export const extractPackages = (
   lockFile: string,
   { verbose, silent }: { verbose?: boolean; silent?: boolean },
@@ -72,9 +85,44 @@ export const extractPackages = (
     console.info();
   }
 
+  const jsrPackages = Object.groupBy(
+    normalizeJsrKeys(jsrKeys),
+    ({ version }) => version === undefined ? "missingVersion" : "valid",
+  );
+  const npmPackages = Object.groupBy(
+    normalizeNpmKeys(npmKeys),
+    ({ version }) => version === undefined ? "missingVersion" : "valid",
+  );
+  const esmPackages = Object.groupBy(
+    normalizeEsmKeys(esmKeys),
+    ({ version }) => version === undefined ? "missingVersion" : "valid",
+  );
+
+  if (jsrPackages.missingVersion) {
+    console.warn(
+      `Missing version for JSR packages: ${
+        jsrPackages.missingVersion.map((p) => p.name).join(", ")
+      }\n`,
+    );
+  }
+  if (npmPackages.missingVersion) {
+    console.warn(
+      `Missing version for NPM packages: ${
+        npmPackages.missingVersion.map((p) => p.name).join(", ")
+      }\n`,
+    );
+  }
+  if (esmPackages.missingVersion) {
+    console.warn(
+      `Missing version for ESM packages: ${
+        esmPackages.missingVersion.map((p) => p.name).join(", ")
+      }\n`,
+    );
+  }
+
   return {
-    jsr: normalizeJsrKeys(jsrKeys),
-    npm: normalizeNpmKeys(npmKeys),
-    esm: normalizeEsmKeys(esmKeys),
+    jsr: jsrPackages.valid ?? [],
+    npm: npmPackages.valid ?? [],
+    esm: esmPackages.valid ?? [],
   };
 };

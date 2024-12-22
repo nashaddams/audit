@@ -1,18 +1,18 @@
 import type { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
-/** @internal*/
+/** @internal */
 export const severities = ["low", "moderate", "high", "critical"] as const;
 
-/** @internal*/
+/** @internal */
 export type Severity = typeof severities[number];
 
-/** @internal*/
+/** @internal */
 export type Package = {
   name: string;
-  version: string;
+  version?: string;
 };
 
-/** @internal*/
+/** @internal */
 export type RunAudit = (
   packages: Package[],
   options: {
@@ -23,7 +23,7 @@ export type RunAudit = (
 ) => number | Promise<number>;
 
 // See https://github.com/jsr-io/jsr/blob/main/frontend/utils/api.ts
-/** @internal*/
+/** @internal */
 export type JsrPackage = {
   githubRepository: {
     owner: string;
@@ -32,14 +32,14 @@ export type JsrPackage = {
 };
 
 // See https://github.com/octokit/plugin-rest-endpoint-methods.js/#typescript
-/** @internal*/
+/** @internal */
 export type GitHubAdvisories =
   RestEndpointMethodTypes["securityAdvisories"]["listRepositoryAdvisories"][
     "response"
   ]["data"];
 
 // Inferred from `npm audit --json` output
-/** @internal*/
+/** @internal */
 export type NpmAuditResult = {
   auditReportVersion: number;
   vulnerabilities?: {

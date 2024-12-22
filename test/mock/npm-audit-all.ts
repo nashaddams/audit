@@ -420,12 +420,12 @@ export const npmAuditAll: NpmAuditResult = {
       "total": 10,
     },
     "dependencies": {
-      "prod": 125,
+      "prod": 143,
       "dev": 0,
       "optional": 1,
       "peer": 0,
       "peerOptional": 0,
-      "total": 125,
+      "total": 143,
     },
   },
 };

@@ -136,12 +136,12 @@ export const npmAuditEsmOnly: NpmAuditResult = {
       "total": 3,
     },
     "dependencies": {
-      "prod": 15,
+      "prod": 33,
       "dev": 0,
       "optional": 1,
       "peer": 0,
       "peerOptional": 0,
-      "total": 15,
+      "total": 33,
     },
   },
 };
