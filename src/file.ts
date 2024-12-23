@@ -41,4 +41,13 @@ export const File = {
       console.info(`No audit report found at ${outputDir}/report.md`);
     }
   },
+  readAuditIgnore: (): string[] => {
+    try {
+      const auditIgnoreText = Deno.readTextFileSync(".auditignore").trim();
+      return auditIgnoreText ? auditIgnoreText.split("\n") : [];
+    } catch (err) {
+      if (!(err instanceof Deno.errors.NotFound)) throw err;
+      return [];
+    }
+  },
 };

@@ -8,6 +8,7 @@ import { auditNpm } from "./audit-npm.ts";
 
 const DEFAULT_LOCK_FILE: string = "deno.lock";
 const DEFAULT_SEVERITY: Severity = "high";
+const DEFAULT_IGNORE: string[] = [];
 const DEFAULT_VERBOSITY: boolean = false;
 const DEFAULT_SILENCE: boolean = false;
 const DEFAULT_OUTPUT_DIR: string = `${Deno.cwd()}/.audit`;
@@ -18,6 +19,8 @@ export type AuditOptions = {
   lock?: string;
   /** Minimum severity of an advisory vulnerability, only affects the return code (default: `high`) */
   severity?: Severity;
+  /** Comma separated list of packages to ignore (default: `[]`) */
+  ignore?: string[] | readonly [];
   /** Print additional output (default: `false`) */
   verbose?: boolean;
   /** Disable output (default: `false`) */
@@ -36,10 +39,11 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
   const {
     lock = DEFAULT_LOCK_FILE,
     severity = DEFAULT_SEVERITY,
+    ignore = DEFAULT_IGNORE,
     verbose = DEFAULT_VERBOSITY,
     silent = DEFAULT_SILENCE,
     outputDir = DEFAULT_OUTPUT_DIR,
-  } = options ?? {};
+  }: AuditOptions = options ?? {};
 
   try {
     Deno.removeSync(outputDir, { recursive: true });
@@ -58,6 +62,7 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
   }
 
   const { jsr, npm, esm } = extractPackages(lock, {
+    ignore,
     verbose,
     silent,
   });
@@ -80,9 +85,12 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 export const runAudit = async (): Promise<void> => {
   await new Command()
     .name("audit")
-    .description("A basic Deno audit tool for JSR, NPM, and ESM packages.")
+    .description(
+      "A tool for auditing JSR, NPM, and ESM packages utilizing the GitHub Advisory Database and npm audit.",
+    )
     .version(denoJson.version)
     .type("severity", new EnumType(severities))
+    .group("Audit options")
     .option("-l, --lock <lock-file:file>", "Deno lock file (v4) to audit.", {
       default: DEFAULT_LOCK_FILE,
     })
@@ -93,6 +101,14 @@ export const runAudit = async (): Promise<void> => {
         default: DEFAULT_SEVERITY,
       },
     )
+    .option(
+      "-i, --ignore <packages:string[]>",
+      "Comma separated list of packages to ignore.",
+      {
+        default: DEFAULT_IGNORE,
+      },
+    )
+    .group("Output options")
     .option("-v, --verbose", "Verbose console output.", {
       default: DEFAULT_VERBOSITY,
     })
@@ -102,11 +118,18 @@ export const runAudit = async (): Promise<void> => {
     .option("-o, --output-dir <output-dir:file>", "Output directory.", {
       default: DEFAULT_OUTPUT_DIR,
     })
-    .action(async ({ lock, severity, verbose, silent, outputDir }) => {
-      const code = await audit({ lock, severity, verbose, silent, outputDir });
+    .action(async ({ lock, severity, ignore, verbose, silent, outputDir }) => {
+      const code = await audit({
+        lock,
+        severity,
+        ignore,
+        verbose,
+        silent,
+        outputDir,
+      });
       Deno.exit(code);
     })
-    .command("report", "Serve the generated audit report")
+    .command("report", "Serve the generated audit report.")
     .option("-o, --output-dir <output-dir:file>", "Output directory", {
       default: DEFAULT_OUTPUT_DIR,
     })
