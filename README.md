@@ -23,14 +23,10 @@ NPM and ESM packages are injected into a generated `package.json` file on which
 
 ## Usage
 
-### Via `deno run` (recommended)
+### Via `deno run`
 
 ```sh
-deno run https://jsr.io/@nashaddams/audit/<version>/mod.ts --help # Print options
-
-deno run \
-  -RWE -N=api.jsr.io,api.github.com --allow-run=npm \
-  https://jsr.io/@nashaddams/audit/<version>/mod.ts
+deno run -A jsr:@nashaddams/audit [--help]
 ```
 
 Running this command will print the audit results to the console, create a
@@ -50,19 +46,43 @@ runAudit(); // CLI wrapper for `audit`
 
 See [the docs](https://jsr.io/@nashaddams/audit/doc) for further details.
 
+### HTML report
+
+The `report` subcommand serves the generated audit report:
+
+```sh
+deno run -A jsr:@nashaddams/audit report
+```
+
 ### Ignoring packages
 
 Packages can be excluded from the audit by passing the package names to the
 `-i, --ignore` flag (comma separated list), or by adding them to an
 `.auditignore` file (one package name per row).
 
-### HTML report
+### Granular `run` permissions
 
-The `report` subcommand serves the generated audit report:
+For convenience, the previous `run` instructions use the `-A` permission flag
+which grants all permissions to `audit`. Alternatively, granular flags can be
+passed instead:
 
-```sh
-deno run \
-  -RE -N=0.0.0.0 \
-  https://jsr.io/@nashaddams/audit/<version>/mod.ts \
-  report
-```
+| Command        | Permissions                                                                                   |
+| -------------- | --------------------------------------------------------------------------------------------- |
+| `audit`        | `-RW=. -E=NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=api.jsr.io,api.github.com`<br/>`--allow-run=npm` |
+| `audit report` | `-R=. -E=NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=0.0.0.0`                                          |
+| `audit --help` | `-R=. -E=NO_COLOR,FORCE_COLOR,TERM`                                                           |
+
+<details>
+
+<summary>Details</summary>
+
+| Permission                     | Usage                                                             |
+| ------------------------------ | ----------------------------------------------------------------- |
+| `-R=.`                         | Read the lock file and the report.                                |
+| `-W=.`                         | Write the `package.json` and the report.                          |
+| `-E=NO_COLOR,FORCE_COLOR,TERM` | Used by the `npm audit` subcommand.                               |
+| `-N=api.jsr.io,api.github.com` | Fetch the JSR package information and GitHub security advisories. |
+| `-N=0.0.0.0`                   | Serve the generated audit report.                                 |
+| `--allow-run=npm`              | Run `npm install` and `npm audit`.                                |
+
+</details>
