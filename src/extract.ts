@@ -1,8 +1,8 @@
 import { partition } from "@std/collections/partition";
-import type { Package } from "./types.ts";
+import type { Pkg } from "./types.ts";
 import { File } from "./file.ts";
 
-const deduplicate = (a: Package[]): Package[] => {
+const deduplicate = (a: Pkg[]): Pkg[] => {
   return a.filter((o, index, arr) =>
     arr.findIndex((item) => JSON.stringify(item) === JSON.stringify(o)) ===
       index
@@ -17,7 +17,7 @@ const formatKeys = (keys: string[]): string => {
   return keys.map((key) => ` > ${key}`).join("\n");
 };
 
-const inferNameAndVersion = (key: string): Package => {
+const inferNameAndVersion = (key: string): Pkg => {
   const splitPos = key.lastIndexOf("@");
 
   // Missing version
@@ -34,13 +34,13 @@ const inferNameAndVersion = (key: string): Package => {
   };
 };
 
-const normalizeJsrKeys = (keys: string[]): Package[] => {
+const normalizeJsrKeys = (keys: string[]): Pkg[] => {
   return deduplicate(keys.map(inferNameAndVersion));
 };
 
 const normalizeNpmKeys = normalizeJsrKeys;
 
-const normalizeEsmKeys = (keys: string[]): Package[] => {
+const normalizeEsmKeys = (keys: string[]): Pkg[] => {
   return deduplicate(keys.map((key) => {
     const { pathname } = new URL(key);
     const { name, version } = inferNameAndVersion(pathname);
@@ -64,9 +64,9 @@ export const extractPackages = (
     silent?: boolean;
   },
 ): {
-  jsr: Package[];
-  npm: Package[];
-  esm: Package[];
+  jsr: Pkg[];
+  npm: Pkg[];
+  esm: Pkg[];
 } => {
   const lock: {
     jsr: Record<string, unknown>;

@@ -7,14 +7,14 @@ export const severities = ["low", "moderate", "high", "critical"] as const;
 export type Severity = typeof severities[number];
 
 /** @internal */
-export type Package = {
+export type Pkg = {
   name: string;
   version?: string;
 };
 
 /** @internal */
 export type RunAudit = (
-  packages: Package[],
+  pkgs: Pkg[],
   options: {
     severity: Severity;
     silent: boolean;
@@ -24,7 +24,7 @@ export type RunAudit = (
 
 // See https://github.com/jsr-io/jsr/blob/main/frontend/utils/api.ts
 /** @internal */
-export type JsrPackage = {
+export type JsrPkg = {
   githubRepository: {
     owner: string;
     name: string;
