@@ -1,12 +1,12 @@
-import type { GitHubAdvisories, JsrPkg } from "./types.ts";
+import type { GithubAdvisories, JsrPkg } from "./types.ts";
 
 type Api = {
   fetchJsrPkg: (
     options: { scope: string; pkg: string },
   ) => Promise<JsrPkg | null>;
-  fetchGitHubAdvisories: (
-    options: { owner: string; repo: string },
-  ) => Promise<GitHubAdvisories | null>;
+  fetchGithubAdvisories: (
+    options: { owner: string; repo: string; githubToken?: string },
+  ) => Promise<GithubAdvisories | null>;
 };
 
 /** @internal */
@@ -33,18 +33,24 @@ export const Api: Api = {
       return null;
     }
   },
-  fetchGitHubAdvisories: async ({ owner, repo }) => {
+  fetchGithubAdvisories: async ({ owner, repo, githubToken }) => {
     const res = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/security-advisories`,
       {
         headers: {
+          "Accept": "application/vnd.github+json",
           "X-GitHub-Api-Version": "2022-11-28",
+          ...(githubToken
+            ? {
+              "Authorization": `Bearer ${githubToken}`,
+            }
+            : {}),
         },
       },
     );
 
     try {
-      const json = await res.json() as GitHubAdvisories;
+      const json = await res.json() as GithubAdvisories;
 
       if (!res.ok) {
         throw new Error(JSON.stringify(json, null, 2));

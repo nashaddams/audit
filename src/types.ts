@@ -19,6 +19,7 @@ export type RunAudit = (
     severity: Severity;
     silent: boolean;
     outputDir: string;
+    githubToken?: string;
   },
 ) => number | Promise<number>;
 
@@ -33,7 +34,7 @@ export type JsrPkg = {
 
 // See https://github.com/octokit/plugin-rest-endpoint-methods.js/#typescript
 /** @internal */
-export type GitHubAdvisories =
+export type GithubAdvisories =
   RestEndpointMethodTypes["securityAdvisories"]["listRepositoryAdvisories"][
     "response"
   ]["data"];

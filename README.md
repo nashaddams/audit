@@ -66,23 +66,23 @@ For convenience, the previous `run` instructions use the `-A` permission flag
 which grants all permissions to `audit`. Alternatively, granular flags can be
 passed instead:
 
-| Command        | Permissions                                                                                   |
-| -------------- | --------------------------------------------------------------------------------------------- |
-| `audit`        | `-RW=. -E=NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=api.jsr.io,api.github.com`<br/>`--allow-run=npm` |
-| `audit report` | `-R=. -E=NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=0.0.0.0`                                          |
-| `audit --help` | `-R=. -E=NO_COLOR,FORCE_COLOR,TERM`                                                           |
+| Command        | Permissions                                                                                                      |
+| -------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `audit`        | `-RW=.`<br/>`-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=api.jsr.io,api.github.com`<br/>`--allow-run=npm` |
+| `audit report` | `-R=.`<br/>`-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=0.0.0.0`                                          |
+| `audit --help` | `-R=.`<br/>`-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`                                                           |
 
 <details>
 
 <summary>Details</summary>
 
-| Permission                     | Usage                                                             |
-| ------------------------------ | ----------------------------------------------------------------- |
-| `-R=.`                         | Read the lock file and the report.                                |
-| `-W=.`                         | Write the `package.json` and the report.                          |
-| `-E=NO_COLOR,FORCE_COLOR,TERM` | Used by the `npm audit` subcommand.                               |
-| `-N=api.jsr.io,api.github.com` | Fetch the JSR package information and GitHub security advisories. |
-| `-N=0.0.0.0`                   | Serve the generated audit report.                                 |
-| `--allow-run=npm`              | Run `npm install` and `npm audit`.                                |
+| Permission                                  | Usage                                                                      |
+| ------------------------------------------- | -------------------------------------------------------------------------- |
+| `-R=.`                                      | Read the lock file and the report.                                         |
+| `-W=.`                                      | Write the `package.json` and the report.                                   |
+| `-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM` | Used for authenticated GitHub API requests and the `npm audit` subcommand. |
+| `-N=api.jsr.io,api.github.com`              | Fetch the JSR package information and GitHub security advisories.          |
+| `-N=0.0.0.0`                                | Serve the generated audit report.                                          |
+| `--allow-run=npm`                           | Run `npm install` and `npm audit`.                                         |
 
 </details>
