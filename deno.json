@@ -20,8 +20,11 @@
     "audit": "deno run -RW=. -E=NO_COLOR,FORCE_COLOR,TERM -N=api.jsr.io,api.github.com --allow-run=\"npm\" mod.ts",
     "report": "deno run -R=. -E=NO_COLOR,FORCE_COLOR,TERM -N=0.0.0.0 mod.ts report",
     "test": "deno test -RW -N=api.jsr.io,api.github.com --coverage=cov",
-    "coverage": "deno coverage --exclude=test --lcov cov > cov.lcov && deno coverage --exclude=test cov",
-    "doc": "deno doc --html mod.ts"
+    "coverage:lcov": "deno coverage --exclude=test --lcov cov > cov.lcov",
+    "coverage:html": "deno coverage --html --exclude=test cov",
+    "coverage:console": "deno coverage --exclude=test cov",
+    "coverage": "deno task coverage:lcov && deno task coverage:html && deno task coverage:console",
+    "doc": "deno doc --html mod.ts && deno doc --lint mod.ts"
   },
   "publish": {
     "include": [
