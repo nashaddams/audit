@@ -82,7 +82,7 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 /**
  * Audit JSR, NPM, and ESM packages with CLI options (powered by [Cliffy](https://cliffy.io/)).
  */
-export const runAudit = async (): Promise<void> => {
+export const runAudit = async (args = Deno.args): Promise<void> => {
   await new Command()
     .name("audit")
     .description(
@@ -153,5 +153,5 @@ export const runAudit = async (): Promise<void> => {
         console.info(`No audit report found at ${outputDir}/report.html`);
       }
     })
-    .parse();
+    .parse(args);
 };
