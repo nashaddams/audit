@@ -1,10 +1,5 @@
 import type { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
-
-/** @internal */
-export const severities = ["low", "moderate", "high", "critical"] as const;
-
-/** @internal */
-export type Severity = typeof severities[number];
+import type { Severity } from "./severity.ts";
 
 /** @internal */
 export type Pkg = {
@@ -30,6 +25,16 @@ export type JsrPkg = {
     owner: string;
     name: string;
   } | null;
+};
+
+/** @internal */
+// All modules on deno.land/x need to be hosted as public repositories on GitHub.com.
+export type DenolandPkg = {
+  upload_options: {
+    type: string;
+    repository: string;
+    ref: string;
+  };
 };
 
 // See https://github.com/octokit/plugin-rest-endpoint-methods.js/#typescript

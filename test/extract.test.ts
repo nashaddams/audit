@@ -99,4 +99,27 @@ describe("extract", () => {
       { name: "echarts", version: "5.5.1" },
     ]);
   });
+
+  it("should extract deno.land packages", () => {
+    Deno.writeTextFileSync(
+      tmpLockFile!,
+      JSON.stringify({
+        remote: {
+          "https://deno.land/std@0.214.0/crypto/_wasm/mod.ts": "",
+          "https://deno.land/std@0.214.0/path/relative.ts": "",
+          "https://deno.land/x/postgresjs@v3.4.5/mod.ts": "",
+        },
+      }),
+    );
+
+    const { denoland } = extractPackages(tmpLockFile!, {
+      silent: true,
+      verbose: false,
+    });
+
+    assertEquals(denoland, [
+      { name: "std", version: "0.214.0" },
+      { name: "postgresjs", version: "v3.4.5" },
+    ]);
+  });
 });

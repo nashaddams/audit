@@ -1,9 +1,12 @@
-import type { GithubAdvisories, JsrPkg } from "./types.ts";
+import type { DenolandPkg, GithubAdvisories, JsrPkg } from "./types.ts";
 
 type Api = {
   fetchJsrPkg: (
     options: { scope: string; pkg: string },
   ) => Promise<JsrPkg | null>;
+  fetchDenolandPkg: (
+    options: { pkg: string; version: string },
+  ) => Promise<DenolandPkg | null>;
   fetchGithubAdvisories: (
     options: { owner: string; repo: string; githubToken?: string },
   ) => Promise<GithubAdvisories | null>;
@@ -30,6 +33,24 @@ export const Api: Api = {
       return json;
     } catch (err) {
       console.warn(`Unable to fetch JSR package @${scope}/${pkg}`, err);
+      return null;
+    }
+  },
+  fetchDenolandPkg: async ({ pkg, version }) => {
+    const res = await fetch(
+      `https://cdn.deno.land/${pkg}/versions/${version}/meta/meta.json`,
+    );
+
+    try {
+      const json = await res.json() as DenolandPkg;
+
+      if (!res.ok) {
+        throw new Error(JSON.stringify(json, null, 2));
+      }
+
+      return json;
+    } catch (err) {
+      console.warn(`Unable to fetch deno.land package ${pkg}/${version}`, err);
       return null;
     }
   },
