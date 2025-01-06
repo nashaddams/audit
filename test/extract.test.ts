@@ -122,4 +122,40 @@ describe("extract", () => {
       { name: "postgresjs", version: "v3.4.5" },
     ]);
   });
+
+  it("should resolve NPM package keys containing multiple packages", () => {
+    Deno.writeTextFileSync(
+      tmpLockFile!,
+      JSON.stringify({
+        npm: {
+          "@algolia/autocomplete-core@1.17.7_algoliasearch@5.18.0": {},
+          "@algolia/autocomplete-plugin-algolia-insights@1.17.7_search-insights@2.17.3_algoliasearch@5.18.0":
+            {},
+          "@algolia/autocomplete-preset-algolia@1.17.7_@algolia+client-search@5.18.0_algoliasearch@5.18.0":
+            {},
+          "@vitejs/plugin-vue@5.2.1_vite@5.4.11_vue@3.5.13": {},
+        },
+      }),
+    );
+
+    const { npm } = extractPackages(tmpLockFile!, {
+      silent: true,
+      verbose: false,
+    });
+
+    assertEquals(npm, [
+      { name: "@algolia/autocomplete-core", version: "1.17.7" },
+      { name: "algoliasearch", version: "5.18.0" },
+      {
+        name: "@algolia/autocomplete-plugin-algolia-insights",
+        version: "1.17.7",
+      },
+      { name: "search-insights", version: "2.17.3" },
+      { name: "@algolia/autocomplete-preset-algolia", version: "1.17.7" },
+      { name: "@algolia/client-search", version: "5.18.0" },
+      { name: "@vitejs/plugin-vue", version: "5.2.1" },
+      { name: "vite", version: "5.4.11" },
+      { name: "vue", version: "3.5.13" },
+    ]);
+  });
 });
