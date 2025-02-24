@@ -1,19 +1,15 @@
 import { Command, EnumType } from "@cliffy/command";
+import { intersect } from "@std/collections/intersect";
 import denoJson from "../deno.json" with { type: "json" };
-import { severities, type Severity } from "./severity.ts";
+import { inferSeverities, severities, type Severity } from "./severity.ts";
+import type { PkgResolved } from "./types.ts";
 import { File } from "./file.ts";
-import { extractPackages } from "./extract.ts";
-import { auditJsr } from "./audit-jsr.ts";
-import { auditDenoland } from "./audit-denoland.ts";
-import { auditNpm } from "./audit-npm.ts";
+import { Report } from "./report.ts";
+import { resolve } from "./resolve.ts";
 
 const DEFAULT_LOCK_FILE: string = "deno.lock";
 const DEFAULT_SEVERITY: Severity = "high";
-const DEFAULT_IGNORE: string[] = [];
-const DEFAULT_VERBOSITY: boolean = false;
-const DEFAULT_SILENCE: boolean = false;
 const DEFAULT_OUTPUT_DIR: string = `${Deno.cwd()}/.audit`;
-const DEFAULT_GITHUB_TOKEN: string | undefined = Deno.env.get("GITHUB_TOKEN");
 
 /** Options for the {@link audit} function. */
 export type AuditOptions = {
@@ -21,20 +17,12 @@ export type AuditOptions = {
   lock?: string;
   /** Minimum severity of an advisory vulnerability, only affects the return code (default: `high`) */
   severity?: Severity;
-  /** Comma separated list of packages to ignore (default: `[]`) */
-  ignore?: string[] | readonly [];
-  /** Print additional output (default: `false`) */
-  verbose?: boolean;
-  /** Disable output (default: `false`) */
-  silent?: boolean;
   /** Output directory (default: `.audit`) */
   outputDir?: string;
-  /** Token for authenticated GitHub API requests (default: `undefined`) */
-  githubToken?: string;
 };
 
 /**
- * Audit JSR, NPM, and ESM packages.
+ * Audit JSR, deno.land, NPM, and ESM packages.
  *
  * @param {AuditOptions} options Audit options
  * @returns {Promise<number>} An exit code indicating if vulnerabilities have been found (`1`) or not (`0`).
@@ -43,11 +31,7 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
   const {
     lock = DEFAULT_LOCK_FILE,
     severity = DEFAULT_SEVERITY,
-    ignore = DEFAULT_IGNORE,
-    verbose = DEFAULT_VERBOSITY,
-    silent = DEFAULT_SILENCE,
     outputDir = DEFAULT_OUTPUT_DIR,
-    githubToken = DEFAULT_GITHUB_TOKEN,
   }: AuditOptions = options ?? {};
 
   try {
@@ -60,43 +44,52 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 
   Deno.mkdirSync(outputDir);
 
-  File.writeReport(outputDir, "# Audit report\n");
+  File.writeReport(outputDir, "# Audit report\n\n");
 
-  if (!silent) {
-    console.info(`Using lock file: %c${lock}\n`, "font-weight: bold");
-  }
+  const { ignore = {} } = File.readConfig();
+  const resolved = await resolve(lock);
 
-  const { jsr, npm, esm, denoland } = extractPackages(lock, {
-    ignore,
-    verbose,
-    silent,
-  });
+  const pkgs = Object.keys(ignore).length > 0
+    ? resolved
+      .map((r) => {
+        const toIgnore = ignore[r.name];
 
-  const jsrAuditCode = await auditJsr(jsr, {
-    severity,
-    silent,
-    outputDir,
-    githubToken,
-  });
-  const denolandAuditCode = await auditDenoland(denoland, {
-    severity,
-    silent,
-    outputDir,
-    githubToken,
-  });
-  const npmAuditCode = await auditNpm([...npm, ...esm], {
-    severity,
-    silent,
-    outputDir,
-  });
+        if (toIgnore) {
+          const filteredAdvisories = r.advisories?.filter((a) =>
+            !toIgnore.find((cve) => cve === a.cve_id)
+          );
 
+          if (filteredAdvisories?.length) {
+            return {
+              ...r,
+              advisories: filteredAdvisories,
+            };
+          }
+          return undefined;
+        }
+        return r;
+      })
+      .filter((r): r is PkgResolved => !!r)
+    : resolved;
+
+  const reportString = Report.createGithubAdvisoriesReport({ pkgs });
+  console.info(reportString);
+  File.writeReport(outputDir, reportString);
   File.generateHtmlReport(outputDir);
 
-  return jsrAuditCode || denolandAuditCode || npmAuditCode;
+  const severitiesToInclude = inferSeverities(severity);
+  const severities = pkgs.flatMap(({ advisories }) =>
+    advisories?.map((advisory) => advisory.severity)
+  );
+
+  if (intersect(severitiesToInclude, severities).length > 0) {
+    return 1;
+  }
+  return 0;
 };
 
 /**
- * Audit JSR, NPM, and ESM packages with CLI options (powered by [Cliffy](https://cliffy.io/)).
+ * Audit JSR, deno.land, NPM, and ESM packages with CLI options (powered by [Cliffy](https://cliffy.io/)).
  */
 export const runAudit = async (args = Deno.args): Promise<void> => {
   await new Command()
@@ -121,35 +114,18 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
         default: DEFAULT_SEVERITY,
       },
     )
-    .option(
-      "-i, --ignore <packages:string[]>",
-      "Comma separated list of packages to ignore.",
-      {
-        default: DEFAULT_IGNORE,
-      },
-    )
     .group("Output options")
-    .option("-v, --verbose", "Verbose console output.", {
-      default: DEFAULT_VERBOSITY,
-    })
-    .option("--silent", "Mute console output.", {
-      default: DEFAULT_SILENCE,
-    })
     .option("-o, --output-dir <output-dir:file>", "Output directory.", {
       default: DEFAULT_OUTPUT_DIR,
     })
     .action(
       async (
-        { lock, severity, ignore, verbose, silent, outputDir, githubToken },
+        { lock, severity, outputDir },
       ) => {
         const code = await audit({
           lock,
           severity,
-          ignore,
-          verbose,
-          silent,
           outputDir,
-          githubToken,
         });
         Deno.exit(code);
       },
@@ -163,7 +139,7 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
         const auditHtml = Deno.readFileSync(".audit/report.html");
         Deno.serve(
           {
-            port: 0,
+            port: 4711,
             hostname: "0.0.0.0",
             onListen: (({ port, hostname }) => {
               console.info(

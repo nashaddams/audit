@@ -3,58 +3,29 @@ export const snapshot = {};
 snapshot[`ESM only 1`] = `
 "# Audit report
 
-## NPM/ESM
-
-### handlebars
-
-Severity: critical | Affected versions: <=4.7.6 | Patched versions: 4.7.8
+## echarts 5.5.1 \`esm\`
 
 \`\`\`
-Title: Remote code execution in handlebars when compiling templates
-Severity: critical
-Details: https://github.com/advisories/GHSA-f2jv-r9rf-7988
+Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
+Severity: low
+Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
+CVE: CVE-2024-52793
+GHSA: GHSA-32fx-h446-h8pf
 
-Affected package: handlebars
-Affected versions: <4.7.7
-Patched versions: 4.7.8
+Affected package: @std/http (other)
+Affected versions: <= 1.0.10
+Patched versions: 1.0.11
 \`\`\`
 \`\`\`
-Title: Prototype Pollution in handlebars
-Severity: critical
-Details: https://github.com/advisories/GHSA-765h-qjxv-5f44
+Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
+Severity: low
+Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
+CVE: CVE-2024-52793
+GHSA: GHSA-32fx-h446-h8pf
 
-Affected package: handlebars
-Affected versions: <4.7.7
-Patched versions: 4.7.8
+Affected package: @std/http (other)
+Affected versions: <= 1.0.10
+Patched versions: 1.0.11
 \`\`\`
-
-### minimist
-
-Severity: critical | Affected versions: <=0.2.3 | Patched versions: 4.7.8
-
-\`\`\`
-Title: Prototype Pollution in minimist
-Severity: moderate
-Details: https://github.com/advisories/GHSA-vh95-rmgr-6w4m
-
-Affected package: minimist
-Affected versions: <0.2.1
-Patched versions: 4.7.8
-\`\`\`
-\`\`\`
-Title: Prototype Pollution in minimist
-Severity: critical
-Details: https://github.com/advisories/GHSA-xvch-5gv4-984h
-
-Affected package: minimist
-Affected versions: <0.2.4
-Patched versions: 4.7.8
-\`\`\`
-
-### optimist
-
-Severity: critical | Affected versions: >=0.6.0 | Patched versions: 4.7.8
-
-
 "
 `;
