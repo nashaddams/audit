@@ -6,6 +6,7 @@ import type { PkgResolved } from "./types.ts";
 import { File } from "./file.ts";
 import { Report } from "./report.ts";
 import { resolve } from "./resolve.ts";
+import { match } from "./match.ts";
 
 const DEFAULT_LOCK_FILE: string = "deno.lock";
 const DEFAULT_SEVERITY: Severity = "high";
@@ -46,11 +47,12 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 
   File.writeReport(outputDir, "# Audit report\n\n");
 
-  const { ignore = {} } = File.readConfig();
   const resolved = await resolve(lock);
+  const matched = match(resolved);
+  const { ignore = {} } = File.readConfig();
 
   const pkgs = Object.keys(ignore).length > 0
-    ? resolved
+    ? matched
       .map((r) => {
         const toIgnore = ignore[r.name];
 
@@ -70,7 +72,7 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
         return r;
       })
       .filter((r): r is PkgResolved => !!r)
-    : resolved;
+    : matched;
 
   const reportString = Report.createGithubAdvisoriesReport({ pkgs });
   console.info(reportString);
