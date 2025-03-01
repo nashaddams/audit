@@ -23,8 +23,18 @@ export const Report: Report = {
               "```",
               `Title: ${advisory.summary ?? fallback}`,
               `Severity: ${advisory.severity ?? fallback}`,
+              `Published: ${
+                advisory.published_at?.substring(0, 10) ?? fallback
+              }`,
               `Details: ${advisory.html_url ?? fallback}`,
               `CVE: ${advisory.cve_id ?? fallback}`,
+              `CWE: ${
+                advisory.cwes?.length
+                  ? advisory.cwes
+                    .map((cwe) => `${cwe.cwe_id}: ${cwe.name}`)
+                    .join(", ")
+                  : fallback
+              }`,
               `GHSA: ${advisory.ghsa_id ?? fallback}`,
               "",
               advisory.vulnerabilities?.flatMap((vulnerability) => {
