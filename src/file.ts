@@ -1,5 +1,6 @@
 import { CSS, render } from "@deno/gfm";
 import { join } from "@std/path";
+import type { PkgResolved } from "./types.ts";
 
 /** @internal */
 export type Config = {
@@ -18,6 +19,22 @@ export const File = {
     } catch {
       return {};
     }
+  },
+  writePackages: (outputDir: string, pkgs: PkgResolved[]): void => {
+    Deno.writeTextFileSync(
+      `${outputDir}/packages.json`,
+      JSON.stringify(
+        pkgs.map((pkg) => ({
+          origin: pkg.origin,
+          name: pkg.name,
+          version: pkg.version,
+          owner: pkg.owner,
+          repo: pkg.repo,
+        })),
+        null,
+        2,
+      ),
+    );
   },
   writeReport: (outputDir: string, data: string): void => {
     Deno.writeTextFileSync(`${outputDir}/report.md`, data, { append: true });
