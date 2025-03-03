@@ -9,7 +9,7 @@ import { resolve } from "./resolve.ts";
 import { match } from "./match.ts";
 
 const DEFAULT_LOCK_FILE: string = "deno.lock";
-const DEFAULT_SEVERITY: Severity = "high";
+const DEFAULT_SEVERITY: Severity = "medium";
 const DEFAULT_OUTPUT_DIR: string = `${Deno.cwd()}/.audit`;
 
 /** Options for the {@link audit} function. */
