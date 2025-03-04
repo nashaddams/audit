@@ -45,8 +45,6 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 
   Deno.mkdirSync(outputDir);
 
-  File.writeReport(outputDir, "# Audit report\n\n");
-
   const resolved = await resolve(lock);
   File.writePackages(outputDir, resolved);
   const resolvedWithAdvisories = resolved.filter((pkg) =>
@@ -80,7 +78,10 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
     : matched;
 
   const reportString = Report.createGithubAdvisoriesReport({ pkgs });
+
+  console.info("\n# Audit report\n");
   console.info(reportString);
+  File.writeReport(outputDir, "# Audit report\n\n");
   File.writeReport(outputDir, reportString);
   File.generateHtmlReport(outputDir);
 
