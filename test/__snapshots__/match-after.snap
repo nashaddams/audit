@@ -17,6 +17,15 @@ snapshot[`Match (after) 1`] = `
     ],
   ],
   [
+    "@babel/helper-string-parser",
+    "7.25.9",
+    [
+      "<= 7.23.0",
+      "8.0.0-alpha.0 - 8.0.0-alpha.3",
+      "*",
+    ],
+  ],
+  [
     "@esbuild/aix-ppc64",
     "0.21.5",
     [

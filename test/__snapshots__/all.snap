@@ -6,30 +6,85 @@ snapshot[`All 1`] = `
 ## std 0.214.0 \`denoland\`
 
 \`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Published: 2024-11-22
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-CWE: CWE-80: Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)
-GHSA: GHSA-32fx-h446-h8pf
+Title: Bypass CSRF Middleware by a request without Content-Type header
+Severity: medium
+Published: 2024-10-15
+Details: https://github.com/honojs/hono/security/advisories/GHSA-2234-fmw7-43wr
+CVE: CVE-2024-48913
+CWE: CWE-352: Cross-Site Request Forgery (CSRF)
+GHSA: GHSA-2234-fmw7-43wr
 
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
+Affected package: hono (npm)
+Affected versions: < 4.6.5
+Patched versions: 4.6.5
 \`\`\`
 \`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Published: 2024-11-22
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-CWE: CWE-80: Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)
-GHSA: GHSA-32fx-h446-h8pf
+Title: Possible SSRF and Credential Leakage via Absolute URL in axios Requests
+Severity: medium
+Published: 2025-03-07
+Details: https://github.com/axios/axios/security/advisories/GHSA-jr5f-v2jv-69x6
+CVE: CVE-2025-27152
+CWE: N/A
+GHSA: GHSA-jr5f-v2jv-69x6
 
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
+Affected package: axios (npm)
+Affected versions: <= 1.7.9
+Patched versions: 1.8.2
+\`\`\`
+\`\`\`
+Title: Prototype Pollution in zrender
+Severity: low
+Published: 2021-09-17
+Details: https://github.com/ecomfe/zrender/security/advisories/GHSA-fhv8-fx5f-7fxf
+CVE: CVE-2021-39227
+CWE: CWE-1321: Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')
+GHSA: GHSA-fhv8-fx5f-7fxf
+
+Affected package: zrender (npm)
+Affected versions: <= 5.2.0, <= 4.3.2
+Patched versions: 5.2.1, 4.3.3
+\`\`\`
+
+## @algolia/autocomplete-core 1.17.9 \`npm\`
+
+\`\`\`
+Title: Bypass CSRF Middleware by a request without Content-Type header
+Severity: medium
+Published: 2024-10-15
+Details: https://github.com/honojs/hono/security/advisories/GHSA-2234-fmw7-43wr
+CVE: CVE-2024-48913
+CWE: CWE-352: Cross-Site Request Forgery (CSRF)
+GHSA: GHSA-2234-fmw7-43wr
+
+Affected package: hono (npm)
+Affected versions: < 4.6.5
+Patched versions: 4.6.5
+\`\`\`
+\`\`\`
+Title: Possible SSRF and Credential Leakage via Absolute URL in axios Requests
+Severity: medium
+Published: 2025-03-07
+Details: https://github.com/axios/axios/security/advisories/GHSA-jr5f-v2jv-69x6
+CVE: CVE-2025-27152
+CWE: N/A
+GHSA: GHSA-jr5f-v2jv-69x6
+
+Affected package: axios (npm)
+Affected versions: <= 1.7.9
+Patched versions: 1.8.2
+\`\`\`
+\`\`\`
+Title: Prototype Pollution in zrender
+Severity: low
+Published: 2021-09-17
+Details: https://github.com/ecomfe/zrender/security/advisories/GHSA-fhv8-fx5f-7fxf
+CVE: CVE-2021-39227
+CWE: CWE-1321: Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')
+GHSA: GHSA-fhv8-fx5f-7fxf
+
+Affected package: zrender (npm)
+Affected versions: <= 5.2.0, <= 4.3.2
+Patched versions: 5.2.1, 4.3.3
 \`\`\`
 "
 `;

@@ -3,5 +3,20 @@ export const snapshot = {};
 snapshot[`ESM only 1`] = `
 "# Audit report
 
+## @emotion/is-prop-valid 1.2.2 \`esm\`
+
+\`\`\`
+Title: Prototype Pollution in zrender
+Severity: low
+Published: 2021-09-17
+Details: https://github.com/ecomfe/zrender/security/advisories/GHSA-fhv8-fx5f-7fxf
+CVE: CVE-2021-39227
+CWE: CWE-1321: Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')
+GHSA: GHSA-fhv8-fx5f-7fxf
+
+Affected package: zrender (npm)
+Affected versions: <= 5.2.0, <= 4.3.2
+Patched versions: 5.2.1, 4.3.3
+\`\`\`
 "
 `;

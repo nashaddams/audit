@@ -1,0 +1,120 @@
+[
+  {
+    "ghsa_id": "GHSA-32fx-h446-h8pf",
+    "cve_id": "CVE-2024-52793",
+    "url": "https://api.github.com/repos/denoland/std/security-advisories/GHSA-32fx-h446-h8pf",
+    "html_url": "https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf",
+    "summary": "XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems",
+    "description": "### Summary\r\n\r\n`http/file-server`'s `serveDir` with `showDirListing: true` option is XSS-able by a user who can control file names in the source directory on systems with POSIX file names. Might also be possible on other systems but less trivial due to e.g. lack of file name support for `<>` in Windows.\r\n\r\n### Details\r\n\r\nhttps://github.com/denoland/std/blob/065296ca5a05a47f9741df8f99c32fae4f960070/http/file_server.ts#L507\r\n\r\nand\r\n\r\nhttps://github.com/denoland/std/blob/065296ca5a05a47f9741df8f99c32fae4f960070/http/file_server.ts#L532\r\n\r\n### PoC\r\n\r\nOn Linux:\r\n\r\n```ts\r\n// main.ts\r\nimport { serveDir } from '@std/http/file-server'\r\n\r\nDeno.serve((req) => serveDir(req, {\r\n    showDirListing: true,\r\n}))\r\n```\r\n\r\n```sh\r\ntouch \"./<img src=x onerror=alert(1)>\"\r\ndeno run -RN main.ts\r\n```\r\n\r\nThen visit route `/`.\r\n\r\n### Impact\r\n\r\nThe usages of `serveDir` with `showDirListing: true` are affected when the directory being served has end-user-writable file names.",
+    "severity": "low",
+    "author": null,
+    "publisher": {
+      "login": "kt3k",
+      "id": 613956,
+      "node_id": "MDQ6VXNlcjYxMzk1Ng==",
+      "avatar_url": "https://avatars.githubusercontent.com/u/613956?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/kt3k",
+      "html_url": "https://github.com/kt3k",
+      "followers_url": "https://api.github.com/users/kt3k/followers",
+      "following_url": "https://api.github.com/users/kt3k/following{/other_user}",
+      "gists_url": "https://api.github.com/users/kt3k/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/kt3k/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/kt3k/subscriptions",
+      "organizations_url": "https://api.github.com/users/kt3k/orgs",
+      "repos_url": "https://api.github.com/users/kt3k/repos",
+      "events_url": "https://api.github.com/users/kt3k/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/kt3k/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "identifiers": [
+      {
+        "value": "GHSA-32fx-h446-h8pf",
+        "type": "GHSA"
+      },
+      {
+        "value": "CVE-2024-52793",
+        "type": "CVE"
+      }
+    ],
+    "state": "published",
+    "created_at": null,
+    "updated_at": "2024-11-22T11:11:40Z",
+    "published_at": "2024-11-22T11:11:39Z",
+    "closed_at": null,
+    "withdrawn_at": null,
+    "submission": null,
+    "vulnerabilities": [
+      {
+        "package": {
+          "ecosystem": "jsr",
+          "name": "@std/http"
+        },
+        "vulnerable_version_range": "<= 1.0.10",
+        "patched_versions": "1.0.11",
+        "vulnerable_functions": []
+      }
+    ],
+    "cvss_severities": {
+      "cvss_v3": {
+        "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N",
+        "score": null
+      },
+      "cvss_v4": {
+        "vector_string": null,
+        "score": null
+      }
+    },
+    "cwes": [
+      {
+        "cwe_id": "CWE-80",
+        "name": "Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)"
+      }
+    ],
+    "cwe_ids": [
+      "CWE-80"
+    ],
+    "credits": [
+      {
+        "login": "lionel-rowe",
+        "type": "reporter"
+      }
+    ],
+    "credits_detailed": [
+      {
+        "user": {
+          "login": "lionel-rowe",
+          "id": 26078826,
+          "node_id": "MDQ6VXNlcjI2MDc4ODI2",
+          "avatar_url": "https://avatars.githubusercontent.com/u/26078826?v=4",
+          "gravatar_id": "",
+          "url": "https://api.github.com/users/lionel-rowe",
+          "html_url": "https://github.com/lionel-rowe",
+          "followers_url": "https://api.github.com/users/lionel-rowe/followers",
+          "following_url": "https://api.github.com/users/lionel-rowe/following{/other_user}",
+          "gists_url": "https://api.github.com/users/lionel-rowe/gists{/gist_id}",
+          "starred_url": "https://api.github.com/users/lionel-rowe/starred{/owner}{/repo}",
+          "subscriptions_url": "https://api.github.com/users/lionel-rowe/subscriptions",
+          "organizations_url": "https://api.github.com/users/lionel-rowe/orgs",
+          "repos_url": "https://api.github.com/users/lionel-rowe/repos",
+          "events_url": "https://api.github.com/users/lionel-rowe/events{/privacy}",
+          "received_events_url": "https://api.github.com/users/lionel-rowe/received_events",
+          "type": "User",
+          "user_view_type": "public",
+          "site_admin": false
+        },
+        "type": "reporter",
+        "state": "accepted"
+      }
+    ],
+    "collaborating_users": null,
+    "collaborating_teams": null,
+    "private_fork": null,
+    "cvss": {
+      "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N",
+      "score": null
+    }
+  }
+]
