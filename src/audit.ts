@@ -158,7 +158,9 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
           () => new Response(auditHtml),
         );
       } catch (err) {
-        if (!(err instanceof Deno.errors.NotFound)) throw err;
+        if (!(err instanceof Deno.errors.NotFound)) {
+          throw err;
+        }
         console.info(`No audit report found at ${outputDir}/report.html`);
       }
     })
