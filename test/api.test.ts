@@ -53,6 +53,22 @@ describe("api", () => {
     assertEquals(pkg, null);
   });
 
+  it("should fetch an NPM package", async () => {
+    const pkg = await Api.fetchNpmPkg({ pkg: "zod" });
+
+    assertObjectMatch(pkg!, {
+      repository: {
+        url: "git+https://github.com/colinhacks/zod.git",
+      },
+    });
+  });
+
+  it("should return null for a non-existent NPM package", async () => {
+    const pkg = await Api.fetchNpmPkg({ pkg: "non-existent-package-4711" });
+
+    assertEquals(pkg, null);
+  });
+
   it("should fetch GitHub security advisories", async () => {
     const advisories = await Api.fetchGithubAdvisories({
       owner: "nashaddams",

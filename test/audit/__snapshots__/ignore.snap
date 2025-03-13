@@ -1,0 +1,7 @@
+export const snapshot = {};
+
+snapshot[`ignore 1`] = `
+"# Audit report
+
+"
+`;
