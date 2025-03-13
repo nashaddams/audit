@@ -1,0 +1,20 @@
+export const snapshot = {};
+
+snapshot[`report fallback 1`] = `
+"## amqp \`jsr\`
+
+\`\`\`
+Title: N/A
+Severity: N/A
+Published: N/A
+Details: N/A
+CVE: N/A
+CWE: N/A
+GHSA: N/A
+
+Affected package: N/A (N/A)
+Affected versions: N/A
+Patched versions: N/A
+\`\`\`
+"
+`;
