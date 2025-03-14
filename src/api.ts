@@ -59,7 +59,7 @@ export const Api: Api = {
 
       return json;
     } catch (err) {
-      console.warn(`Unable to fetch JSR package @${scope}/${pkg}`, err);
+      console.warn(`\nUnable to fetch JSR package @${scope}/${pkg}`, err);
       return null;
     }
   },
@@ -77,7 +77,10 @@ export const Api: Api = {
 
       return json;
     } catch (err) {
-      console.warn(`Unable to fetch deno.land package ${pkg}/${version}`, err);
+      console.warn(
+        `\nUnable to fetch deno.land package ${pkg}/${version}`,
+        err,
+      );
       return null;
     }
   },
@@ -94,7 +97,7 @@ export const Api: Api = {
 
       return json;
     } catch (err) {
-      console.warn(`Unable to fetch NPM package ${pkg}`, err);
+      console.warn(`\nUnable to fetch NPM package ${pkg}`, err);
       return null;
     }
   },
@@ -125,7 +128,7 @@ export const Api: Api = {
 
       return json;
     } catch (err) {
-      console.warn(`Unable to fetch advisories from ${owner}/${repo}`, err);
+      console.warn(`\nUnable to fetch advisories from ${owner}/${repo}`, err);
       return null;
     }
   },
