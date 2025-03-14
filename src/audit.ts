@@ -1,6 +1,7 @@
 import { Command, EnumType } from "@cliffy/command";
 import { intersect } from "@std/collections/intersect";
 import denoJson from "../deno.json" with { type: "json" };
+import { type ResolverRegistry, resolvers } from "./resolver/mod.ts";
 import { inferSeverities, severities, type Severity } from "./severity.ts";
 import type { PkgResolved } from "./types.ts";
 import { File } from "./file.ts";
@@ -12,6 +13,7 @@ const DEFAULT_SEVERITY: Severity = "medium";
 const DEFAULT_LOCK_FILE: string = `${Deno.cwd()}/deno.lock`;
 const DEFAULT_CONFIG_FILE: string = `${Deno.cwd()}/audit.json`;
 const DEFAULT_OUTPUT_DIR: string = `${Deno.cwd()}/.audit`;
+const DEFAULT_RESOLVER: keyof typeof ResolverRegistry = "deno-lock";
 
 /** Options for the {@link audit} function. */
 export type AuditOptions = {
@@ -23,6 +25,8 @@ export type AuditOptions = {
   configFile?: string;
   /** Output directory path (default: `.audit`) */
   outputDir?: string;
+  /** Resolver to use (default: `deno-lock`) */
+  resolver?: keyof typeof ResolverRegistry;
 };
 
 /**
@@ -37,6 +41,7 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
     lockFile = DEFAULT_LOCK_FILE,
     configFile = DEFAULT_CONFIG_FILE,
     outputDir = DEFAULT_OUTPUT_DIR,
+    resolver = DEFAULT_RESOLVER,
   }: AuditOptions = options ?? {};
 
   try {
@@ -49,7 +54,7 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 
   Deno.mkdirSync(outputDir);
 
-  const resolved = await resolve(lockFile);
+  const resolved = await resolve(lockFile, resolver);
   File.writePackages(outputDir, resolved);
   const resolvedWithAdvisories = resolved.filter((pkg) =>
     pkg.advisories?.length
@@ -118,6 +123,7 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
       },
     )
     .type("severity", new EnumType(severities))
+    .type("resolver", new EnumType(resolvers))
     .env(
       "GITHUB_TOKEN=<token:string>",
       "Token for authenticated GitHub API requests.",
@@ -142,13 +148,22 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
     .option("-o, --output-dir <output-dir:file>", "Output directory.", {
       default: DEFAULT_OUTPUT_DIR,
     })
+    .option(
+      "-r, --resolver <resolver:resolver>",
+      "Resolver to use.",
+      {
+        default: DEFAULT_RESOLVER,
+        hidden: true,
+      },
+    )
     .action(
-      async ({ lockFile, severity, outputDir, configFile }) => {
+      async ({ severity, lockFile, configFile, outputDir, resolver }) => {
         const code = await audit({
-          lockFile,
           severity,
-          outputDir,
+          lockFile,
           configFile,
+          outputDir,
+          resolver,
         });
         Deno.exit(code);
       },

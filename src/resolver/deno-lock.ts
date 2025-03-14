@@ -1,4 +1,4 @@
-import type { Resolver } from "./resolver.ts";
+import type { Resolver } from "../types.ts";
 import { Api } from "../api.ts";
 
 const extractKeys = (obj?: { [key: string]: unknown }): string[] => {

@@ -1,8 +1,7 @@
 import { Spinner } from "@std/cli/unstable-spinner";
-import type { Pkg, PkgResolved } from "./types.ts";
-import type { Resolver } from "./resolver/resolver.ts";
+import { ResolverRegistry } from "./resolver/mod.ts";
+import type { Pkg, PkgResolved, Resolver } from "./types.ts";
 import { Api } from "./api.ts";
-import DenoLockResolver from "./resolver/deno-lock.ts";
 
 const deduplicate = (pkgs: Pkg[]): Pkg[] => {
   return pkgs.filter((pkg, i, arr) =>
@@ -11,8 +10,11 @@ const deduplicate = (pkgs: Pkg[]): Pkg[] => {
 };
 
 /** @internal */
-export const resolve = async (path: string): Promise<PkgResolved[]> => {
-  const resolvers: Resolver[] = [DenoLockResolver];
+export const resolve = async (
+  path: string,
+  resolver: keyof typeof ResolverRegistry,
+): Promise<PkgResolved[]> => {
+  const resolvers: Resolver[] = [ResolverRegistry[resolver]];
 
   const spinner = new Spinner({ message: "Resolving...", color: "yellow" });
   spinner.start();
