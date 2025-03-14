@@ -52,7 +52,7 @@ describe("[audit] NPM", () => {
       },
     );
 
-    const code = await audit({ lock: "test/audit/examples/npm/deno.lock" });
+    const code = await audit({ lockFile: "test/audit/examples/npm/deno.lock" });
     assertEquals(code, 1);
 
     await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {

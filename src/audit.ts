@@ -8,17 +8,20 @@ import { Report } from "./report.ts";
 import { resolve } from "./resolve.ts";
 import { match } from "./match.ts";
 
-const DEFAULT_LOCK_FILE: string = "deno.lock";
 const DEFAULT_SEVERITY: Severity = "medium";
+const DEFAULT_LOCK_FILE: string = `${Deno.cwd()}/deno.lock`;
+const DEFAULT_CONFIG_FILE: string = `${Deno.cwd()}/audit.json`;
 const DEFAULT_OUTPUT_DIR: string = `${Deno.cwd()}/.audit`;
 
 /** Options for the {@link audit} function. */
 export type AuditOptions = {
-  /** Path to the Deno lock file (default: `deno.lock`) */
-  lock?: string;
   /** Minimum severity of an advisory vulnerability, only affects the return code (default: `high`) */
   severity?: Severity;
-  /** Output directory (default: `.audit`) */
+  /** Path to the Deno lock file (default: `deno.lock`) */
+  lockFile?: string;
+  /** Configuration file path (default: `audit.json`) */
+  configFile?: string;
+  /** Output directory path (default: `.audit`) */
   outputDir?: string;
 };
 
@@ -26,12 +29,13 @@ export type AuditOptions = {
  * Audit JSR, deno.land, NPM, and ESM packages.
  *
  * @param {AuditOptions} options Audit options
- * @returns {Promise<number>} An exit code indicating if vulnerabilities have been found (`1`) or not (`0`).
+ * @returns {Promise<number>} An exit code indicating if vulnerabilities have been found and matched (`1`) or not (`0`).
  */
 export const audit = async (options?: AuditOptions): Promise<number> => {
   const {
-    lock = DEFAULT_LOCK_FILE,
     severity = DEFAULT_SEVERITY,
+    lockFile = DEFAULT_LOCK_FILE,
+    configFile = DEFAULT_CONFIG_FILE,
     outputDir = DEFAULT_OUTPUT_DIR,
   }: AuditOptions = options ?? {};
 
@@ -45,13 +49,13 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 
   Deno.mkdirSync(outputDir);
 
-  const resolved = await resolve(lock);
+  const resolved = await resolve(lockFile);
   File.writePackages(outputDir, resolved);
   const resolvedWithAdvisories = resolved.filter((pkg) =>
     pkg.advisories?.length
   );
   const matched = match(resolvedWithAdvisories);
-  const { ignore = {} } = File.readConfig();
+  const { ignore = {} } = File.readConfig(configFile);
 
   const pkgs = Object.keys(ignore).length > 0
     ? matched
@@ -106,37 +110,52 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
       "A tool for auditing JSR, deno.land, NPM, and ESM packages utilizing the GitHub Advisory Database.",
     )
     .version(denoJson.version)
+    .versionOption(
+      "-v, --version",
+      "Print the version.",
+      function (this: Command) {
+        console.info(this.getVersion());
+      },
+    )
     .type("severity", new EnumType(severities))
     .env(
       "GITHUB_TOKEN=<token:string>",
       "Token for authenticated GitHub API requests.",
     )
-    .group("Audit options")
-    .option("-l, --lock <lock-file:file>", "Deno lock file (v4) to audit.", {
-      default: DEFAULT_LOCK_FILE,
-    })
     .option(
       "-s, --severity <severity:severity>",
-      "Minimum severity (only affects the return code).",
+      "Minimum severity, only affects the return code.",
       {
         default: DEFAULT_SEVERITY,
       },
     )
-    .group("Output options")
+    .option(
+      "-l, --lock-file <lock-file:file>",
+      "Deno lock file (v4) to audit.",
+      {
+        default: DEFAULT_LOCK_FILE,
+      },
+    )
+    .option("-c, --config-file <config-file:file>", "Configuration file.", {
+      default: DEFAULT_CONFIG_FILE,
+    })
     .option("-o, --output-dir <output-dir:file>", "Output directory.", {
       default: DEFAULT_OUTPUT_DIR,
     })
     .action(
-      async (
-        { lock, severity, outputDir },
-      ) => {
+      async ({ lockFile, severity, outputDir, configFile }) => {
         const code = await audit({
-          lock,
+          lockFile,
           severity,
           outputDir,
+          configFile,
         });
         Deno.exit(code);
       },
+    )
+    .example(
+      "audit.json",
+      '{\n  "ignore": {\n    "@std/bytes": ["CVE-2024-12345"],\n    "@std/cli": ["GHSA-1234-fwm1-12wm"]\n  }\n}',
     )
     .command("report", "Serve the generated audit report.")
     .option("-o, --output-dir <output-dir:file>", "Output directory", {

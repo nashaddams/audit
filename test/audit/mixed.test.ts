@@ -75,7 +75,9 @@ describe("[audit] mixed", () => {
       },
     );
 
-    const code = await audit({ lock: "test/audit/examples/mixed/deno.lock" });
+    const code = await audit({
+      lockFile: "test/audit/examples/mixed/deno.lock",
+    });
     assertEquals(code, 1);
 
     await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {

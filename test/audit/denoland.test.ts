@@ -55,7 +55,7 @@ describe("[audit] deno.land", () => {
     );
 
     const code = await audit({
-      lock: "test/audit/examples/denoland/deno.lock",
+      lockFile: "test/audit/examples/denoland/deno.lock",
     });
     assertEquals(code, 1);
 
