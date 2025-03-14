@@ -11,7 +11,7 @@ A tool for auditing [JSR](https://jsr.io), [deno.land](https://deno.land/x),
 
 ## Workflow
 
-- Extract the packages from a given `deno.lock` (v4) file
+- Extract the packages from a given lock file
 - Resolve the corresponding GitHub repositories
   - JSR via `api.jsr.io`
   - deno.land via `cdn.deno.land`
