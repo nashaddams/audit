@@ -16,7 +16,7 @@ export const Report: Report = {
     return [
       pkgs.flatMap(({ origin, name, version, advisories }) => {
         return [
-          `## ${name}${version ? ` ${version}` : ""} \`${origin}\``,
+          `## ${name} ${version} \`${origin}\``,
           "",
           advisories?.flatMap((advisory) => {
             return [

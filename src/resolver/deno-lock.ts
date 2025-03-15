@@ -1,27 +1,13 @@
 import type { Resolver } from "../types.ts";
 import { Api } from "../api.ts";
+import {
+  inferNameAndVersion,
+  resolveJsrRepo,
+  resolveNpmRepo,
+} from "./utils.ts";
 
 const extractKeys = (obj?: { [key: string]: unknown }): string[] => {
   return obj ? Object.keys(obj) : [];
-};
-
-const inferNameAndVersion = (
-  key: string,
-): { name: string; version?: string } => {
-  const splitPos = key.lastIndexOf("@");
-
-  // Missing version
-  if (splitPos === -1) {
-    return {
-      name: key,
-      version: undefined,
-    };
-  }
-
-  return {
-    name: key.slice(0, splitPos),
-    version: key.slice(splitPos + 1).split("/")[0],
-  };
 };
 
 /** @internal */
@@ -48,34 +34,33 @@ const resolver: Resolver<"deno-lock", ["jsr", "denoland", "npm", "esm"]> = {
       normalize(keys) {
         return keys
           .map(inferNameAndVersion)
-          .filter((pkg) => pkg.version !== undefined);
+          .filter((pkg) => pkg !== null);
       },
-      async resolveGithubRepo({ name }) {
-        const [scope, pkg] = name.slice(1).split("/");
-        const jsrPkg = await Api.fetchJsrPkg({ scope, pkg });
-
-        return {
-          owner: jsrPkg?.githubRepository?.owner,
-          repo: jsrPkg?.githubRepository?.name,
-        };
-      },
+      resolveGithubRepo: resolveJsrRepo,
     },
     denoland: {
       normalize(keys) {
         return keys
           .map((key) => {
             const { pathname } = new URL(key);
-            const { name, version } = inferNameAndVersion(pathname);
 
             // deno.land keys may contain an `/x/` in the url
-            const sanitizedName = name.replace(/\/x/g, "");
+            const sanitizedPath = pathname
+              .replace(/\/x/g, "")
+              .slice(1); // Remove leading slash
+
+            const pkg = inferNameAndVersion(sanitizedPath);
+
+            if (pkg === null) {
+              return null;
+            }
 
             return {
-              name: sanitizedName.slice(1),
-              version,
+              name: pkg.name,
+              version: pkg.version,
             };
           })
-          .filter((pkg) => pkg.version !== undefined);
+          .filter((pkg) => pkg !== null);
       },
       async resolveGithubRepo({ name, version }) {
         const denolandPkg = await Api.fetchDenolandPkg({
@@ -96,62 +81,35 @@ const resolver: Resolver<"deno-lock", ["jsr", "denoland", "npm", "esm"]> = {
           .flatMap((key) => key.includes("_") ? key.split("_") : key)
           .map((key) => key.replaceAll("+", "/"))
           .map(inferNameAndVersion)
-          .filter((pkg) => pkg.version !== undefined);
+          .filter((pkg) => pkg !== null);
       },
-      async resolveGithubRepo({ name }) {
-        const npmPkg = await Api.fetchNpmPkg({ pkg: name });
-        const repoUrl = npmPkg?.repository?.url;
-        const [owner, repo] = repoUrl
-          ?.replace("https://github.com/", "")
-          .replace("git+", "")
-          .replace(".git", "")
-          .replace("git:", "")
-          .replace("#main", "")
-          .split(
-            "/",
-          ) ?? [undefined, undefined];
-
-        return {
-          owner,
-          repo,
-        };
-      },
+      resolveGithubRepo: resolveNpmRepo,
     },
     esm: {
       normalize(keys) {
         return keys
           .map((key) => {
             const { pathname } = new URL(key);
-            const { name, version } = inferNameAndVersion(pathname);
 
             // ESM keys may contain url artifacts like `/stable/`, `/v135/`
-            const sanitizedName = name.replace(/\/v([0-9]+)|\/stable/g, "");
+            const sanitizedPath = pathname
+              .replace(/\/v([0-9]+)|\/stable/g, "")
+              .slice(1); // Remove leading slash
+
+            const pkg = inferNameAndVersion(sanitizedPath);
+
+            if (pkg === null) {
+              return null;
+            }
 
             return {
-              name: sanitizedName.slice(1),
-              version,
+              name: pkg.name,
+              version: pkg.version,
             };
           })
-          .filter((pkg) => pkg.version !== undefined);
+          .filter((pkg) => pkg !== null);
       },
-      async resolveGithubRepo({ name }) {
-        const npmPkg = await Api.fetchNpmPkg({ pkg: name });
-        const repoUrl = npmPkg?.repository?.url;
-        const [owner, repo] = repoUrl
-          ?.replace("https://github.com/", "")
-          .replace("git+", "")
-          .replace(".git", "")
-          .replace("git:", "")
-          .replace("#main", "")
-          .split(
-            "/",
-          ) ?? [undefined, undefined];
-
-        return {
-          owner,
-          repo,
-        };
-      },
+      resolveGithubRepo: resolveNpmRepo,
     },
   },
 };

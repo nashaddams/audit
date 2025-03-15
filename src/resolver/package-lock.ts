@@ -1,9 +1,15 @@
 import type { Resolver } from "../types.ts";
-import { Api } from "../api.ts";
+import {
+  inferNameAndVersion,
+  resolveJsrRepo,
+  resolveNpmRepo,
+} from "./utils.ts";
 
-const extractKeys = (obj?: Record<string, { version: string }>): string[] => {
-  return obj
-    ? Object.entries(obj)
+const extractKeys = (
+  arr?: [string, { version: string; name?: string }][],
+): string[] => {
+  return arr
+    ? arr
       .filter(([key]) => key)
       .map(([key, { version }]) =>
         `${key.slice(key.lastIndexOf("node_modules/") + 13)}@${version ?? ""}`
@@ -11,35 +17,27 @@ const extractKeys = (obj?: Record<string, { version: string }>): string[] => {
     : [];
 };
 
-const inferNameAndVersion = (
-  key: string,
-): { name: string; version?: string } => {
-  const splitPos = key.lastIndexOf("@");
-
-  // Missing version
-  if (splitPos === -1) {
-    return {
-      name: key,
-      version: undefined,
-    };
-  }
-
-  return {
-    name: key.slice(0, splitPos),
-    version: key.slice(splitPos + 1).split("/")[0],
-  };
-};
-
 /** @internal */
-const resolver: Resolver<"package-lock", ["npm"]> = {
+const resolver: Resolver<"package-lock", ["npm", "jsr"]> = {
   name: "package-lock",
   extract(path) {
     const { packages }: {
-      packages: Record<string, { version: string }>;
+      packages: Record<string, { version: string; name?: string }>;
     } = JSON.parse(Deno.readTextFileSync(path));
 
+    const { jsrPkgs, npmPkgs } = Object.groupBy(
+      Object.entries(packages),
+      ([_, { name }]) => {
+        if (name && name.includes("jsr")) {
+          return "jsrPkgs";
+        }
+        return "npmPkgs";
+      },
+    );
+
     return {
-      npm: extractKeys(packages),
+      npm: extractKeys(npmPkgs),
+      jsr: extractKeys(jsrPkgs),
     };
   },
   origins: {
@@ -47,26 +45,17 @@ const resolver: Resolver<"package-lock", ["npm"]> = {
       normalize(keys) {
         return keys
           .map(inferNameAndVersion)
-          .filter((pkg) => pkg.version !== undefined);
+          .filter((pkg) => pkg !== null);
       },
-      async resolveGithubRepo({ name }) {
-        const npmPkg = await Api.fetchNpmPkg({ pkg: name });
-        const repoUrl = npmPkg?.repository?.url;
-        const [owner, repo] = repoUrl
-          ?.replace("https://github.com/", "")
-          .replace("git+", "")
-          .replace(".git", "")
-          .replace("git:", "")
-          .replace("#main", "")
-          .split(
-            "/",
-          ) ?? [undefined, undefined];
-
-        return {
-          owner,
-          repo,
-        };
+      resolveGithubRepo: resolveNpmRepo,
+    },
+    jsr: {
+      normalize(keys) {
+        return keys
+          .map(inferNameAndVersion)
+          .filter((pkg) => pkg !== null);
       },
+      resolveGithubRepo: resolveJsrRepo,
     },
   },
 };
