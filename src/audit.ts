@@ -86,22 +86,27 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
       .filter((r): r is PkgResolved => !!r)
     : matched;
 
-  const reportString = Report.createGithubAdvisoriesReport({ pkgs });
+  if (pkgs.length > 0) {
+    const reportString = Report.createGithubAdvisoriesReport({ pkgs });
 
-  console.info("\n# Audit report\n");
-  console.info(reportString);
-  File.writeReport(outputDir, "# Audit report\n\n");
-  File.writeReport(outputDir, reportString);
-  File.generateHtmlReport(outputDir);
+    console.info("\n# Audit report\n");
+    console.info(reportString);
+    File.writeReport(outputDir, "# Audit report\n\n");
+    File.writeReport(outputDir, reportString);
+    File.generateHtmlReport(outputDir);
 
-  const severitiesToInclude = inferSeverities(severity);
-  const severities = pkgs.flatMap(({ advisories }) =>
-    advisories?.map((advisory) => advisory.severity)
-  );
+    const severitiesToInclude = inferSeverities(severity);
+    const severities = pkgs.flatMap(({ advisories }) =>
+      advisories?.map((advisory) => advisory.severity)
+    );
 
-  if (intersect(severitiesToInclude, severities).length > 0) {
-    return 1;
+    if (intersect(severitiesToInclude, severities).length > 0) {
+      return 1;
+    }
+  } else {
+    console.info("\nNo vulnerabilities found or matched.\n");
   }
+
   return 0;
 };
 
