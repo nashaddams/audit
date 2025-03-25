@@ -1,4 +1,6 @@
 import type { GithubAdvisories } from "./types.ts";
+import { File } from "./file.ts";
+import { Env } from "./env.ts";
 
 // See https://github.com/jsr-io/jsr/blob/main/frontend/utils/api.ts
 type JsrPkg = {
@@ -60,6 +62,7 @@ export const Api: Api = {
       return json;
     } catch (err) {
       console.warn(`\nUnable to fetch JSR package @${scope}/${pkg}`, err);
+      File.writeUnresolvedPackage(`@${scope}/${pkg} (missing JSR package)`);
       return null;
     }
   },
@@ -81,11 +84,13 @@ export const Api: Api = {
         `\nUnable to fetch deno.land package ${pkg}/${version}`,
         err,
       );
+      File.writeUnresolvedPackage(
+        `${pkg}/${version} (missing deno.land package)`,
+      );
       return null;
     }
   },
   fetchNpmPkg: async ({ pkg }) => {
-    // `https://www.npmjs.com/package/${pkg}/v/${version}/provenance`,
     const res = await fetch(`https://registry.npmjs.org/${pkg}`);
 
     try {
@@ -98,11 +103,12 @@ export const Api: Api = {
       return json;
     } catch (err) {
       console.warn(`\nUnable to fetch NPM package ${pkg}`, err);
+      File.writeUnresolvedPackage(`${pkg} (missing NPM package)`);
       return null;
     }
   },
   fetchGithubAdvisories: async ({ owner, repo }) => {
-    const githubToken: string | undefined = Deno.env.get("GITHUB_TOKEN");
+    const githubToken: string | undefined = Env.GITHUB_TOKEN;
 
     const res = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/security-advisories`,
@@ -129,6 +135,9 @@ export const Api: Api = {
       return json;
     } catch (err) {
       console.warn(`\nUnable to fetch advisories from ${owner}/${repo}`, err);
+      File.writeUnresolvedPackage(
+        `${owner}/${repo} (missing GitHub advisories)`,
+      );
       return null;
     }
   },

@@ -7,7 +7,7 @@ import { Stub } from "./utils/stubs.ts";
 
 describe("[audit] config", () => {
   afterEach(() => {
-    Deno.removeSync(".audit", { recursive: true });
+    File.clearOutputDir();
   });
 
   it("should ignore packages", async () => {

@@ -1,5 +1,6 @@
 import type { Pkg, Resolver } from "../types.ts";
 import { Api } from "../api.ts";
+import { File } from "../file.ts";
 
 /**
  * Infer the name and version from a string.
@@ -27,6 +28,7 @@ export const inferNameAndVersion = (key: string): Pkg | null => {
   // Missing version
   if (splitPos === -1) {
     console.warn(`\nMissing version for package ${key}`);
+    File.writeUnresolvedPackage(`${key} (missing version)`);
     return null;
   }
 
@@ -39,6 +41,7 @@ export const inferNameAndVersion = (key: string): Pkg | null => {
 
   if (!name || !version) {
     console.warn(`\nMissing name or version for package ${key}`);
+    File.writeUnresolvedPackage(`${key} (missing name or version)`);
     return null;
   }
 
@@ -57,6 +60,22 @@ export const resolveJsrRepo: Resolver["origins"][number]["resolveGithubRepo"] =
     return {
       owner: jsrPkg?.githubRepository?.owner,
       repo: jsrPkg?.githubRepository?.name,
+    };
+  };
+
+/** @internal */
+export const resolveDenolandRepo:
+  Resolver["origins"][number]["resolveGithubRepo"] = async (
+    { name, version },
+  ) => {
+    const denolandPkg = await Api.fetchDenolandPkg({
+      pkg: name,
+      version: version!,
+    });
+
+    return {
+      owner: denolandPkg?.upload_options.repository.split("/")[0],
+      repo: denolandPkg?.upload_options.repository.split("/")[1],
     };
   };
 

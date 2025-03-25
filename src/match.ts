@@ -10,6 +10,7 @@ import {
   tryParseRange,
 } from "@std/semver";
 import type { PkgResolved } from "./types.ts";
+import { File } from "./file.ts";
 
 const transformVersionRanges = (versionRange: string): string => {
   // Match version ranges like "8.0.0-alpha.0 - 8.0.0-alpha.16" or "8.0.1 - 8.0.2"
@@ -67,6 +68,10 @@ export const match = (pkgs: PkgResolved[]): PkgResolved[] => {
           );
           console.warn(`Package version: ${pkg.version}`);
           console.warn(`Vulnerability version: ${vv}`);
+
+          File.writeUnresolvedPackage(
+            `${pkg.name}/${pkg.version} (unparseable vulnerability version: ${vv})`,
+          );
 
           return undefined;
         }

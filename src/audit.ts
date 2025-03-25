@@ -1,7 +1,7 @@
 import { Command, EnumType } from "@cliffy/command";
 import { intersect } from "@std/collections/intersect";
 import denoJson from "../deno.json" with { type: "json" };
-import { type ResolverRegistry, resolvers } from "./resolver/mod.ts";
+import { type ResolverName, resolvers } from "./resolver/mod.ts";
 import { inferSeverities, severities, type Severity } from "./severity.ts";
 import type { PkgResolved } from "./types.ts";
 import { File } from "./file.ts";
@@ -9,58 +9,43 @@ import { Report } from "./report.ts";
 import { resolve } from "./resolve.ts";
 import { match } from "./match.ts";
 
-const DEFAULT_SEVERITY: Severity = "medium";
 const DEFAULT_LOCK_FILE: string = `${Deno.cwd()}/deno.lock`;
-const DEFAULT_CONFIG_FILE: string = `${Deno.cwd()}/audit.json`;
-const DEFAULT_OUTPUT_DIR: string = `${Deno.cwd()}/.audit`;
-const DEFAULT_RESOLVER: keyof typeof ResolverRegistry = "deno-lock";
+const DEFAULT_SEVERITY: Severity = "medium";
+const DEFAULT_RESOLVER: ResolverName = "deno-lock";
 
 /** Options for the {@link audit} function. */
 export type AuditOptions = {
-  /** Minimum severity of an advisory vulnerability, only affects the return code (default: `medium`) */
-  severity?: Severity;
-  /** Path to the lock file (default: `deno.lock`) */
+  /** Path to the lock file (default: `deno.lock`). */
   lockFile?: string;
-  /** Configuration file path (default: `audit.json`) */
-  configFile?: string;
-  /** Output directory path (default: `.audit`) */
-  outputDir?: string;
-  /** Resolver to use (default: `deno-lock`) */
-  resolver?: keyof typeof ResolverRegistry;
+  /** Minimum severity of an advisory vulnerability, only affects the return code (default: `medium`). */
+  severity?: Severity;
+  /** Resolver to use: `deno-lock`, `package-lock`, `bun-lock` (default: `deno-lock`) */
+  resolver?: ResolverName;
 };
 
 /**
  * Audit JSR, deno.land, NPM, and ESM packages.
  *
- * @param {AuditOptions} options Audit options
+ * @param {AuditOptions} options Audit options.
  * @returns {Promise<number>} An exit code indicating if vulnerabilities have been found and matched (`1`) or not (`0`).
  */
 export const audit = async (options?: AuditOptions): Promise<number> => {
   const {
-    severity = DEFAULT_SEVERITY,
     lockFile = DEFAULT_LOCK_FILE,
-    configFile = DEFAULT_CONFIG_FILE,
-    outputDir = DEFAULT_OUTPUT_DIR,
+    severity = DEFAULT_SEVERITY,
     resolver = DEFAULT_RESOLVER,
   }: AuditOptions = options ?? {};
 
-  try {
-    Deno.removeSync(outputDir, { recursive: true });
-  } catch (err) {
-    if (!(err instanceof Deno.errors.NotFound)) {
-      throw err;
-    }
-  }
-
-  Deno.mkdirSync(outputDir);
+  File.clearOutputDir();
+  File.createOutputDir();
 
   const resolved = await resolve(lockFile, resolver);
-  File.writePackages(outputDir, resolved);
+  File.writePackages(resolved);
   const resolvedWithAdvisories = resolved.filter((pkg) =>
     pkg.advisories?.length
   );
   const matched = match(resolvedWithAdvisories);
-  const { ignore = {} } = File.readConfig(configFile);
+  const { ignore = {} } = File.readConfig();
 
   const pkgs = Object.keys(ignore).length > 0
     ? matched
@@ -91,9 +76,9 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 
     console.info("\n# Audit report\n");
     console.info(reportString);
-    File.writeReport(outputDir, "# Audit report\n\n");
-    File.writeReport(outputDir, reportString);
-    File.generateHtmlReport(outputDir);
+    File.writeReport("# Audit report\n\n");
+    File.writeReport(reportString);
+    File.writeHtmlReport();
 
     const severitiesToInclude = inferSeverities(severity);
     const severities = pkgs.flatMap(({ advisories }) =>
@@ -129,9 +114,18 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
     )
     .type("severity", new EnumType(severities))
     .type("resolver", new EnumType(resolvers))
+    .globalEnv("OUTPUT_DIR=<output-dir:string>", "Output directory.")
+    .env("CONFIG_FILE=<config-file:string>", "Configuration file.")
     .env(
       "GITHUB_TOKEN=<token:string>",
       "Token for authenticated GitHub API requests.",
+    )
+    .option(
+      "-l, --lock-file <lock-file:file>",
+      "Lock file to audit (Deno v4, NPM v3, Bun v1).",
+      {
+        default: DEFAULT_LOCK_FILE,
+      },
     )
     .option(
       "-s, --severity <severity:severity>",
@@ -141,48 +135,25 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
       },
     )
     .option(
-      "-l, --lock-file <lock-file:file>",
-      "Lock file to audit (Deno v4, NPM v3, Bun v1).",
-      {
-        default: DEFAULT_LOCK_FILE,
-      },
-    )
-    .option("-c, --config-file <config-file:file>", "Configuration file.", {
-      default: DEFAULT_CONFIG_FILE,
-    })
-    .option("-o, --output-dir <output-dir:file>", "Output directory.", {
-      default: DEFAULT_OUTPUT_DIR,
-    })
-    .option(
       "-r, --resolver <resolver:resolver>",
       "Resolver used to parse the lock file.",
       {
         default: DEFAULT_RESOLVER,
       },
     )
-    .action(
-      async ({ severity, lockFile, configFile, outputDir, resolver }) => {
-        const code = await audit({
-          severity,
-          lockFile,
-          configFile,
-          outputDir,
-          resolver,
-        });
-        Deno.exit(code);
-      },
-    )
+    .action(async ({ lockFile, severity, resolver }) => {
+      const code = await audit({ lockFile, severity, resolver });
+      Deno.exit(code);
+    })
     .example(
       "audit.json",
       '{\n  "ignore": {\n    "@std/bytes": ["CVE-2024-12345"],\n    "@std/cli": ["GHSA-1234-fwm1-12wm"]\n  }\n}',
     )
     .command("report", "Serve the generated audit report.")
-    .option("-o, --output-dir <output-dir:file>", "Output directory", {
-      default: DEFAULT_OUTPUT_DIR,
-    })
-    .action(({ outputDir }) => {
-      try {
-        const auditHtml = Deno.readFileSync(".audit/report.html");
+    .action(() => {
+      const htmlReport = File.readHtmlReport();
+
+      if (htmlReport !== null) {
         Deno.serve(
           {
             port: 4711,
@@ -193,13 +164,8 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
               );
             }),
           },
-          () => new Response(auditHtml),
+          () => new Response(htmlReport),
         );
-      } catch (err) {
-        if (!(err instanceof Deno.errors.NotFound)) {
-          throw err;
-        }
-        console.info(`No audit report found at ${outputDir}/report.html`);
       }
     })
     .parse(args);

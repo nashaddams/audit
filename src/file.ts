@@ -1,5 +1,6 @@
 import { CSS, render } from "@deno/gfm";
 import type { PkgResolved } from "./types.ts";
+import { Env } from "./env.ts";
 
 /** @internal */
 export type Config = {
@@ -10,18 +11,35 @@ export type Config = {
 
 /** @internal */
 export const File = {
-  readConfig: (configFile: string): Config => {
+  clearOutputDir: () => {
     try {
-      return JSON.parse(
-        Deno.readTextFileSync(configFile),
-      ) as Config;
+      Deno.removeSync(Env.OUTPUT_DIR, { recursive: true });
+    } catch (err) {
+      if (!(err instanceof Deno.errors.NotFound)) {
+        throw err;
+      }
+    }
+  },
+  createOutputDir: () => {
+    try {
+      Deno.mkdirSync(Env.OUTPUT_DIR);
+    } catch (err) {
+      if (!(err instanceof Deno.errors.AlreadyExists)) {
+        throw err;
+      }
+    }
+  },
+  readConfig: (): Config => {
+    try {
+      return JSON.parse(Deno.readTextFileSync(Env.CONFIG_FILE)) as Config;
     } catch {
       return {};
     }
   },
-  writePackages: (outputDir: string, pkgs: PkgResolved[]): void => {
+  writePackages: (pkgs: PkgResolved[]): void => {
+    File.createOutputDir();
     Deno.writeTextFileSync(
-      `${outputDir}/resolved-packages.json`,
+      `${Env.OUTPUT_DIR}/resolved-packages.json`,
       JSON.stringify(
         pkgs.map((pkg) => ({
           origin: pkg.origin,
@@ -35,15 +53,41 @@ export const File = {
       ),
     );
   },
-  writeReport: (outputDir: string, data: string): void => {
-    Deno.writeTextFileSync(`${outputDir}/report.md`, data, { append: true });
+  writeUnresolvedPackage: (pkg: string): void => {
+    File.createOutputDir();
+    Deno.writeTextFileSync(
+      `${Env.OUTPUT_DIR}/unresolved-packages.txt`,
+      `${pkg}\n`,
+      {
+        append: true,
+      },
+    );
   },
-  generateHtmlReport: (outputDir: string): void => {
+  writeReport: (data: string): void => {
+    File.createOutputDir();
+    Deno.writeTextFileSync(`${Env.OUTPUT_DIR}/report.md`, data, {
+      append: true,
+    });
+  },
+  readHtmlReport: (): Uint8Array<ArrayBuffer> | null => {
     try {
-      const auditMd = Deno.readTextFileSync(`${outputDir}/report.md`);
+      return Deno.readFileSync(`${Env.OUTPUT_DIR}/report.html`);
+    } catch (err) {
+      if (!(err instanceof Deno.errors.NotFound)) {
+        throw err;
+      }
+      console.info(`No audit report found at ${Env.OUTPUT_DIR}/report.html`);
+      return null;
+    }
+  },
+  writeHtmlReport: (): void => {
+    File.createOutputDir();
+
+    try {
+      const auditMd = Deno.readTextFileSync(`${Env.OUTPUT_DIR}/report.md`);
 
       Deno.writeTextFileSync(
-        `${outputDir}/report.html`,
+        `${Env.OUTPUT_DIR}/report.html`,
         `
 <!DOCTYPE html>
 <html lang="en">
@@ -68,7 +112,7 @@ export const File = {
       );
     } catch (err) {
       if (!(err instanceof Deno.errors.NotFound)) throw err;
-      console.info(`No audit report found at ${outputDir}/report.md`);
+      console.info(`No audit report found at ${Env.OUTPUT_DIR}/report.md`);
     }
   },
 };

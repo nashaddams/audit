@@ -1,6 +1,7 @@
 import { assertEquals } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import PackageLockResolver from "../../src/resolver/package-lock.ts";
+import { ResolverRegistry } from "../../src/resolver/mod.ts";
+import { File } from "../../src/file.ts";
 
 describe("[resolver] package-lock", () => {
   let tmpLockFile: string | undefined = undefined;
@@ -11,6 +12,7 @@ describe("[resolver] package-lock", () => {
 
   afterEach(() => {
     Deno.removeSync(tmpLockFile!);
+    File.clearOutputDir();
   });
 
   it("should normalize packages and sub-packages", () => {
@@ -40,8 +42,10 @@ describe("[resolver] package-lock", () => {
       }),
     );
 
-    const extracted = PackageLockResolver.extract(tmpLockFile!);
-    const resolved = PackageLockResolver.origins.npm.normalize(extracted.npm);
+    const extracted = ResolverRegistry["package-lock"].extract(tmpLockFile!);
+    const resolved = ResolverRegistry["package-lock"].origins.npm.normalize(
+      extracted.npm,
+    );
 
     assertEquals(resolved, [
       { name: "axios", version: "1.8.3" },

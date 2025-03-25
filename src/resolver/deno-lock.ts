@@ -1,7 +1,7 @@
 import type { Resolver } from "../types.ts";
-import { Api } from "../api.ts";
 import {
   inferNameAndVersion,
+  resolveDenolandRepo,
   resolveJsrRepo,
   resolveNpmRepo,
 } from "./utils.ts";
@@ -62,17 +62,7 @@ const resolver: Resolver<"deno-lock", ["jsr", "denoland", "npm", "esm"]> = {
           })
           .filter((pkg) => pkg !== null);
       },
-      async resolveGithubRepo({ name, version }) {
-        const denolandPkg = await Api.fetchDenolandPkg({
-          pkg: name,
-          version: version!,
-        });
-
-        return {
-          owner: denolandPkg?.upload_options.repository.split("/")[0],
-          repo: denolandPkg?.upload_options.repository.split("/")[1],
-        };
-      },
+      resolveGithubRepo: resolveDenolandRepo,
     },
     npm: {
       normalize(keys) {

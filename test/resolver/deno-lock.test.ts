@@ -1,6 +1,7 @@
 import { assertEquals } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import DenoLockResolver from "../../src/resolver/deno-lock.ts";
+import { ResolverRegistry } from "../../src/resolver/mod.ts";
+import { File } from "../../src/file.ts";
 
 describe("[resolver] deno-lock", () => {
   let tmpLockFile: string | undefined = undefined;
@@ -11,6 +12,7 @@ describe("[resolver] deno-lock", () => {
 
   afterEach(() => {
     Deno.removeSync(tmpLockFile!);
+    File.clearOutputDir();
   });
 
   it("should remove duplicates and url artifacts from ESM packages", () => {
@@ -26,8 +28,10 @@ describe("[resolver] deno-lock", () => {
       }),
     );
 
-    const extracted = DenoLockResolver.extract(tmpLockFile!);
-    const resolved = DenoLockResolver.origins.esm.normalize(extracted.esm);
+    const extracted = ResolverRegistry["deno-lock"].extract(tmpLockFile!);
+    const resolved = ResolverRegistry["deno-lock"].origins.esm.normalize(
+      extracted.esm,
+    );
 
     assertEquals(resolved, [
       { name: "echarts", version: "5.5.1" },
@@ -48,8 +52,10 @@ describe("[resolver] deno-lock", () => {
       }),
     );
 
-    const extracted = DenoLockResolver.extract(tmpLockFile!);
-    const resolved = DenoLockResolver.origins.esm.normalize(extracted.esm);
+    const extracted = ResolverRegistry["deno-lock"].extract(tmpLockFile!);
+    const resolved = ResolverRegistry["deno-lock"].origins.esm.normalize(
+      extracted.esm,
+    );
 
     assertEquals(resolved, [
       { name: "@emotion/is-prop-valid", version: "1.2.2" },
@@ -67,8 +73,10 @@ describe("[resolver] deno-lock", () => {
       }),
     );
 
-    const extracted = DenoLockResolver.extract(tmpLockFile!);
-    const resolved = DenoLockResolver.origins.esm.normalize(extracted.esm);
+    const extracted = ResolverRegistry["deno-lock"].extract(tmpLockFile!);
+    const resolved = ResolverRegistry["deno-lock"].origins.esm.normalize(
+      extracted.esm,
+    );
 
     assertEquals(resolved, []);
   });
@@ -85,8 +93,8 @@ describe("[resolver] deno-lock", () => {
       }),
     );
 
-    const extracted = DenoLockResolver.extract(tmpLockFile!);
-    const resolved = DenoLockResolver.origins.denoland.normalize(
+    const extracted = ResolverRegistry["deno-lock"].extract(tmpLockFile!);
+    const resolved = ResolverRegistry["deno-lock"].origins.denoland.normalize(
       extracted.denoland,
     );
 
@@ -112,8 +120,10 @@ describe("[resolver] deno-lock", () => {
       }),
     );
 
-    const extracted = DenoLockResolver.extract(tmpLockFile!);
-    const resolved = DenoLockResolver.origins.npm.normalize(extracted.npm);
+    const extracted = ResolverRegistry["deno-lock"].extract(tmpLockFile!);
+    const resolved = ResolverRegistry["deno-lock"].origins.npm.normalize(
+      extracted.npm,
+    );
 
     assertEquals(resolved, [
       { name: "@algolia/autocomplete-core", version: "1.17.7" },

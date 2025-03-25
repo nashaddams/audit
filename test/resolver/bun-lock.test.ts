@@ -1,6 +1,7 @@
 import { assertEquals } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import BunLockResolver from "../../src/resolver/bun-lock.ts";
+import { ResolverRegistry } from "../../src/resolver/mod.ts";
+import { File } from "../../src/file.ts";
 
 describe("[resolver] bun-lock", () => {
   let tmpLockFile: string | undefined = undefined;
@@ -11,6 +12,7 @@ describe("[resolver] bun-lock", () => {
 
   afterEach(() => {
     Deno.removeSync(tmpLockFile!);
+    File.clearOutputDir();
   });
 
   it("should normalize packages", () => {
@@ -25,8 +27,10 @@ describe("[resolver] bun-lock", () => {
       }),
     );
 
-    const extracted = BunLockResolver.extract(tmpLockFile!);
-    const resolved = BunLockResolver.origins.npm.normalize(extracted.npm);
+    const extracted = ResolverRegistry["bun-lock"].extract(tmpLockFile!);
+    const resolved = ResolverRegistry["bun-lock"].origins.npm.normalize(
+      extracted.npm,
+    );
 
     assertEquals(resolved, [
       { name: "@algolia/autocomplete-core", version: "1.17.7" },
