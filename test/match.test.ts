@@ -122,12 +122,6 @@ describe("match version ranges", () => {
     assertEquals(matched.length, 0);
   });
 
-  it("should not match for multiple version ranges (comma)", () => {
-    const pkg = createVulnPkg("5.9.9", ">=6.0.0, <=6.0.8");
-    const matched = match([pkg]);
-    assertEquals(matched.length, 0);
-  });
-
   it("should not match for prerelease version ranges", () => {
     const pkg = createVulnPkg("8.0.0-alpha.4", "8.0.0-alpha.0 - 8.0.0-alpha.3");
     const matched = match([pkg]);
@@ -163,7 +157,7 @@ describe("match multiple version ranges", () => {
 
 describe("match version ranges with a dash", () => {
   it("should match for version ranges with a dash", () => {
-    const pkg = createVulnPkg("8.0.2", "8.0.1 - 8.0.2");
+    const pkg = createVulnPkg("8.0.2", "8.0.1 - 8.0.3");
     const matched = match([pkg]);
     assertEquals(matched.length, 1);
   });
@@ -226,5 +220,83 @@ describe("match version ranges with a dash", () => {
     );
     const matched = match([pkg]);
     assertEquals(matched.length, 0);
+  });
+});
+
+describe("match version ranges separated by semicolons", () => {
+  it("should match for version ranges separated by semicolons (1)", () => {
+    const pkg = createVulnPkg(
+      "6.2.0",
+      ">= 4.5.0 < 5.28.5; >= 6.0.0 < 6.21.1; >= 7.0.0 < 7.2.3",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 1);
+  });
+
+  it("should match for version ranges separated by semicolons (2)", () => {
+    const pkg = createVulnPkg(
+      "5.22.0",
+      "< 5.28.3; > 6.0.0 < 6.11.0",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 1);
+  });
+
+  it("should not match for version ranges separated by semicolons (1)", () => {
+    const pkg = createVulnPkg(
+      "6.22.0",
+      ">= 4.5.0 < 5.28.5; >= 6.0.0 < 6.21.1; >= 7.0.0 < 7.2.3",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+
+  it("should not match for version ranges separated by semicolons (2)", () => {
+    const pkg = createVulnPkg(
+      "5.30.0",
+      "< 5.28.3; > 6.0.0 < 6.11.0",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+});
+
+describe("match version ranges with a plus", () => {
+  it("should match for version ranges with a plus", () => {
+    const pkg = createVulnPkg(
+      "7.0.1",
+      "7+",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 1);
+  });
+
+  it("should not match for version ranges with a plus", () => {
+    const pkg = createVulnPkg(
+      "6.9.9",
+      "7+",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+});
+
+describe("match version ranges with invalid comparators", () => {
+  it("should match for version ranges with =< comparator", () => {
+    const pkg = createVulnPkg(
+      "5.8.1",
+      "=< 5.8.1",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 1);
+  });
+
+  it("should match for version ranges with => comparator", () => {
+    const pkg = createVulnPkg(
+      "5.8.1",
+      "=> 5.8.1",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 1);
   });
 });

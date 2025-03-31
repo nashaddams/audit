@@ -12,32 +12,23 @@ import {
 import type { PkgResolved } from "./types.ts";
 import { File } from "./file.ts";
 
-const transformVersionRanges = (versionRange: string): string => {
-  // Match version ranges like "8.0.0-alpha.0 - 8.0.0-alpha.16" or "8.0.1 - 8.0.2"
-  const dashVersionRangeRegex =
-    /([\d.]+(?:-[a-zA-Z\d.]+)?)\s*-\s*([\d.]+(?:-[a-zA-Z\d.]+)?)/g;
+const sanitizeVersionRange = (versionRange: string): string => {
+  return versionRange
+    .replaceAll(",", " || ")
+    .replaceAll(";", " || ")
+    .replaceAll("=<", "<=")
+    .replaceAll("=>", ">=");
+};
 
-  // Only transform version ranges containing a dash
-  if (!dashVersionRangeRegex.test(versionRange)) {
+const transformVersionRangeWithPlus = (versionRange: string): string => {
+  // Match version ranges like 7+
+  const regex = /^(\d+)\+$/;
+
+  if (!regex.test(versionRange)) {
     return versionRange;
   }
 
-  // Match other (valid) version ranges like "<7.26.10" or ">10.0.0"
-  const versionRangeRegex = /(<|>)=?[\d.]+(?:-[a-zA-Z\d.]+)?/g;
-
-  const versionRanges = versionRange.match(versionRangeRegex) || [];
-  const dashVersionRanges = versionRange.match(dashVersionRangeRegex) || [];
-
-  // Add range operators
-  const transformedRanges = dashVersionRanges.map((range) => {
-    const [, start, end] = range.match(
-      /([\d.]+(?:-[a-zA-Z\d.]+)?)\s*-\s*([\d.]+(?:-[a-zA-Z\d.]+)?)/,
-    ) || [];
-    return `>=${start} <=${end}`;
-  });
-
-  // Combine the ranges with "||"
-  return [...versionRanges, ...transformedRanges].join(" || ");
+  return versionRange.replace(/^(\d+)\+$/, ">=$1");
 };
 
 /** @internal */
@@ -56,9 +47,10 @@ export const match = (pkgs: PkgResolved[]): PkgResolved[] => {
           tryParseRange(vv);
 
         if (!version) {
-          // Remove comma and replace dash separators with proper operators
           version = tryParseRange(
-            transformVersionRanges(vv.replaceAll(",", " ")),
+            transformVersionRangeWithPlus(
+              sanitizeVersionRange(vv),
+            ),
           );
         }
 
