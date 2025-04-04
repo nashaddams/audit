@@ -36,7 +36,7 @@ export const File = {
       return {};
     }
   },
-  writePackages: (pkgs: PkgResolved[]): void => {
+  writeResolvedPackages: (pkgs: PkgResolved[]): void => {
     File.createOutputDir();
     Deno.writeTextFileSync(
       `${Env.OUTPUT_DIR}/resolved-packages.json`,
@@ -52,6 +52,21 @@ export const File = {
         2,
       ),
     );
+  },
+  readResolvedPackages: (): PkgResolved[] | null => {
+    try {
+      return JSON.parse(
+        Deno.readTextFileSync(`${Env.OUTPUT_DIR}/resolved-packages.json`),
+      ) as PkgResolved[];
+    } catch (err) {
+      if (!(err instanceof Deno.errors.NotFound)) {
+        throw err;
+      }
+      console.info(
+        `No resolved packages found at ${Env.OUTPUT_DIR}/resolved-packages.json`,
+      );
+      return null;
+    }
   },
   writeUnresolvedPackage: (pkg: string): void => {
     File.createOutputDir();

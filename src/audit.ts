@@ -8,6 +8,7 @@ import { File } from "./file.ts";
 import { Report } from "./report.ts";
 import { resolve } from "./resolve.ts";
 import { match } from "./match.ts";
+import { fetchLicenses } from "./license.ts";
 
 const DEFAULT_LOCK_FILE: string = `${Deno.cwd()}/deno.lock`;
 const DEFAULT_SEVERITY: Severity = "medium";
@@ -40,7 +41,7 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
   File.createOutputDir();
 
   const resolved = await resolve(lockFile, resolver);
-  File.writePackages(resolved);
+  File.writeResolvedPackages(resolved);
   const resolvedWithAdvisories = resolved.filter((pkg) =>
     pkg.advisories?.length
   );
@@ -115,8 +116,8 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
     .type("severity", new EnumType(severities))
     .type("resolver", new EnumType(resolvers))
     .globalEnv("OUTPUT_DIR=<output-dir:string>", "Output directory.")
-    .env("CONFIG_FILE=<config-file:string>", "Configuration file.")
-    .env(
+    .globalEnv("CONFIG_FILE=<config-file:string>", "Configuration file.")
+    .globalEnv(
       "GITHUB_TOKEN=<token:string>",
       "Token for authenticated GitHub API requests.",
     )
@@ -166,6 +167,21 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
           },
           () => new Response(htmlReport),
         );
+      }
+    })
+    .command("licenses", "Fetch the licenses for resolved packages.")
+    .option(
+      "-m, --merge [merge:boolean]",
+      "Merge the licenses into a single file.",
+      {
+        default: false,
+      },
+    )
+    .action(async ({ merge }) => {
+      const resolvedPkgs = File.readResolvedPackages();
+
+      if (resolvedPkgs !== null) {
+        await fetchLicenses(resolvedPkgs, { merge });
       }
     })
     .parse(args);

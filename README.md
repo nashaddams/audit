@@ -72,10 +72,11 @@ For convenience, the previous `run` instructions use the `-A` permission flag
 which grants all permissions to `audit`. Alternatively, granular flags can be
 passed instead:
 
-| Command        | Permissions                                                                                                                                        |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `audit`        | `-RW=.`<br/>`-E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=api.jsr.io,cdn.deno.land,registry.npmjs.org,api.github.com` |
-| `audit report` | `-R=.`<br/>`-E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=0.0.0.0`                                                     |
+| Command          | Permissions                                                                                                                                        |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `audit`          | `-RW=.`<br/>`-E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=api.jsr.io,cdn.deno.land,registry.npmjs.org,api.github.com` |
+| `audit report`   | `-R=.`<br/>`-E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=0.0.0.0`                                                     |
+| `audit licenses` | `-RW.`<br/>`-E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`<br/>`-n=api.github.com`                                              |
 
 <details>
 
@@ -83,8 +84,8 @@ passed instead:
 
 | Permission                                                         | Usage                                                                                      |
 | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| `-R=.`                                                             | Read the lock file and audit report.                                                       |
-| `-W=.`                                                             | Write the audit report.                                                                    |
+| `-R=.`                                                             | Read the lock file, audit report, and resolved packages.                                   |
+| `-W=.`                                                             | Write the audit report, resolved and unresolved packages, and licenses.                    |
 | `-E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM` | Used for audit configurations, authenticated GitHub API requests and the terminal spinner. |
 | `-N=api.jsr.io,cdn.deno.land,registry.npmjs.org,api.github.com`    | Fetch the package information, and GitHub security advisories.                             |
 | `-N=0.0.0.0`                                                       | Serve the generated audit report.                                                          |

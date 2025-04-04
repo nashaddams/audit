@@ -1,6 +1,6 @@
 {
   "name": "@nashaddams/audit",
-  "version": "0.18.2",
+  "version": "0.19.0",
   "license": "MIT",
   "exports": "./mod.ts",
   "imports": {
@@ -23,6 +23,7 @@
     "build": "deno compile -RW=. -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.jsr.io,cdn.deno.land,api.github.com,registry.npmjs.org,0.0.0.0 -o dist/audit mod.ts",
     "audit": "deno run -RW=. -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.jsr.io,cdn.deno.land,api.github.com,registry.npmjs.org mod.ts",
     "report": "deno run -R=. -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=0.0.0.0 mod.ts report",
+    "licenses": "deno run -RW=. -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.github.com mod.ts licenses",
     "test": "deno test -RW -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.jsr.io,api.github.com,cdn.deno.land,registry.npmjs.org --coverage=cov",
     "coverage:lcov": "deno coverage --exclude=test --lcov cov > cov.lcov",
     "coverage:html": "deno coverage --html --exclude=test cov",
