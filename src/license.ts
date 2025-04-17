@@ -1,11 +1,9 @@
 import { Spinner } from "@std/cli/unstable-spinner";
-import type { PkgResolved } from "./types.ts";
+import type { GithubInfo, Pkg, PkgResolved } from "./types.ts";
 import { Env } from "./env.ts";
 import { Api } from "./api.ts";
 
-const deduplicate = (
-  pkgs: { owner?: string; repo?: string }[],
-): { owner?: string; repo?: string }[] => {
+const deduplicate = (pkgs: (Pkg & GithubInfo)[]): (Pkg & GithubInfo)[] => {
   return pkgs.filter((pkg, i, arr) =>
     arr.findIndex((item) => JSON.stringify(item) === JSON.stringify(pkg)) === i
   );
@@ -32,27 +30,34 @@ export const fetchLicenses = async (
   });
 
   try {
-    const repos = deduplicate(
-      pkgs.map((pkg) => ({ owner: pkg.owner, repo: pkg.repo })),
+    const pkgRepos = deduplicate(
+      pkgs.map(({ owner, repo, name, version }) => ({
+        owner,
+        repo,
+        name,
+        version,
+      })),
     );
 
     spinner.start();
 
-    for (const repo of repos) {
-      spinner.message = `Fetching license for ${repo.owner}/${repo.repo}`;
+    for (const { owner, repo, name, version } of pkgRepos) {
+      spinner.message = `Fetching license for ${owner}/${repo}`;
 
-      const license = await Api.fetchLicense(repo);
+      const license = await Api.fetchLicense({ owner, repo });
 
       if (license !== null) {
         Deno.writeTextFileSync(
-          `${Env.OUTPUT_DIR}/licenses/${repo.owner}__${repo.repo}.txt`,
+          `${Env.OUTPUT_DIR}/licenses/${owner}__${repo}__${
+            name.replace("/", "+")
+          }__${version}.txt`,
           license,
         );
 
         if (merge === true) {
           Deno.writeTextFileSync(
             `${Env.OUTPUT_DIR}/licenses/__licenses.txt`,
-            `${repo.owner}/${repo.repo}\n\n${license}\n`,
+            `> ${name} ${version} (${owner}/${repo})\n\n${license}\n`,
             {
               append: true,
             },
