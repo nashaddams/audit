@@ -99,7 +99,7 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 /**
  * Audit JSR, deno.land, NPM, and ESM packages with CLI options (powered by [Cliffy](https://cliffy.io/)).
  */
-export const runAudit = async (args = Deno.args): Promise<void> => {
+export const runAudit = async (args: string[] = Deno.args): Promise<void> => {
   await new Command()
     .name("audit")
     .description(
