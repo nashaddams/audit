@@ -38,20 +38,36 @@ export const File = {
   },
   writeResolvedPackages: (pkgs: PkgResolved[]): void => {
     File.createOutputDir();
-    Deno.writeTextFileSync(
-      `${Env.OUTPUT_DIR}/resolved-packages.json`,
-      JSON.stringify(
-        pkgs.map((pkg) => ({
-          origin: pkg.origin,
-          name: pkg.name,
-          version: pkg.version,
-          owner: pkg.owner,
-          repo: pkg.repo,
-        })),
-        null,
-        2,
-      ),
-    );
+
+    const write = (path: string, pkgsResolved: PkgResolved[]) => {
+      Deno.writeTextFileSync(
+        path,
+        JSON.stringify(
+          pkgsResolved.map((pkg) => ({
+            origin: pkg.origin,
+            name: pkg.name,
+            version: pkg.version,
+            owner: pkg.owner,
+            repo: pkg.repo,
+          })),
+          null,
+          2,
+        ),
+      );
+    };
+
+    for (
+      const [origin, pkgsByOrigin] of Object.entries(
+        Object.groupBy(pkgs, ({ origin }) => origin),
+      )
+    ) {
+      write(
+        `${Env.OUTPUT_DIR}/resolved-packages.${origin}.json`,
+        pkgsByOrigin!,
+      );
+    }
+
+    write(`${Env.OUTPUT_DIR}/resolved-packages.json`, pkgs);
   },
   readResolvedPackages: (): PkgResolved[] | null => {
     try {
