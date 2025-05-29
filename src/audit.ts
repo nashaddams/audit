@@ -1,9 +1,11 @@
 import { Command, EnumType } from "@cliffy/command";
 import { intersect } from "@std/collections/intersect";
+import { bold, green } from "@std/fmt/colors";
 import denoJson from "../deno.json" with { type: "json" };
 import { type ResolverName, resolvers } from "./resolver/mod.ts";
 import { inferSeverities, severities, type Severity } from "./severity.ts";
 import type { PkgResolved } from "./types.ts";
+import { Env } from "./env.ts";
 import { File } from "./file.ts";
 import { Report } from "./report.ts";
 import { resolve } from "./resolve.ts";
@@ -112,7 +114,7 @@ export const runAudit = async (args: string[] = Deno.args): Promise<void> => {
   await new Command()
     .name("audit")
     .description(
-      "A tool for auditing JSR, deno.land, NPM, and ESM packages utilizing the GitHub Advisory Database.",
+      "Audit JSR, deno.land, NPM, and ESM packages utilizing the GitHub Advisory Database.",
     )
     .version(denoJson.version)
     .versionOption(
@@ -124,8 +126,18 @@ export const runAudit = async (args: string[] = Deno.args): Promise<void> => {
     )
     .type("severity", new EnumType(severities))
     .type("resolver", new EnumType(resolvers))
-    .globalEnv("OUTPUT_DIR=<output-dir:string>", "Output directory.")
-    .globalEnv("CONFIG_FILE=<config-file:string>", "Configuration file.")
+    .globalEnv(
+      "OUTPUT_DIR=<output-dir:string>",
+      `Output directory.\t(${bold("Default:")} ${
+        green(`"${Env.OUTPUT_DIR}"`)
+      })`,
+    )
+    .globalEnv(
+      "CONFIG_FILE=<config-file:string>",
+      `Configuration file.\t(${bold("Default:")} ${
+        green(`"${Env.CONFIG_FILE}"`)
+      })`,
+    )
     .globalEnv(
       "GITHUB_TOKEN=<token:string>",
       "Token for authenticated GitHub API requests.",
@@ -174,10 +186,9 @@ export const runAudit = async (args: string[] = Deno.args): Promise<void> => {
         Deno.serve(
           {
             port: 4711,
-            hostname: "0.0.0.0",
             onListen: (({ port, hostname }) => {
               console.info(
-                `Serving audit report at http://${hostname}:${port}/`,
+                `Serving audit report at http://${hostname}:${port}`,
               );
             }),
           },
