@@ -24,6 +24,7 @@ export type GithubInfo = {
 export type PkgResolved = Pkg & GithubInfo & {
   origin: string;
   advisories?: GithubAdvisories;
+  license?: string;
 };
 
 /** @internal */

@@ -49,6 +49,7 @@ export const File = {
             version: pkg.version,
             owner: pkg.owner,
             repo: pkg.repo,
+            license: pkg.license,
           })),
           null,
           2,

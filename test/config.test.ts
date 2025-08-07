@@ -15,8 +15,9 @@ describe("[audit] config", () => {
     using __ = Stub.fetchDenolandPkg;
     using ___ = Stub.fetchNpmPkg;
     using ____ = Stub.fetchGithubAdvisories;
+    using _____ = Stub.fetchLiceseName;
 
-    using _____ = stub(
+    using ______ = stub(
       File,
       "readConfig",
       () => {
