@@ -98,6 +98,12 @@ describe("match version ranges", () => {
     assertEquals(matched.length, 1);
   });
 
+  it("should not match for multiple version ranges (comma)", () => {
+    const pkg = createVulnPkg("4.9.8", ">=4.8.0, <4.9.6");
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+
   it("should match for prerelease version ranges", () => {
     const pkg = createVulnPkg("8.0.0-alpha.2", "8.0.0-alpha.0 - 8.0.0-alpha.3");
     const matched = match([pkg]);
