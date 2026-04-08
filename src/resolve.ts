@@ -10,13 +10,16 @@ const deduplicate = (pkgs: Pkg[]): Pkg[] => {
 };
 
 /** @internal */
-export const resolve = async (
+export const resolvePackages = async (
   path: string,
   resolver: keyof typeof ResolverRegistry,
 ): Promise<PkgResolved[]> => {
   const resolvers: Resolver[] = [ResolverRegistry[resolver]];
 
-  const spinner = new Spinner({ message: "Resolving...", color: "yellow" });
+  const spinner = new Spinner({
+    message: "Resolving packages...",
+    color: "yellow",
+  });
   spinner.start();
 
   const normalizedAndResolved: PkgResolved[] = [];
@@ -42,9 +45,63 @@ export const resolve = async (
     }
   }
 
+  spinner.stop();
+
+  return normalizedAndResolved;
+};
+
+/** @internal */
+export const resolveLicenses = async (
+  pkgs: PkgResolved[],
+): Promise<PkgResolved[]> => {
+  const spinner = new Spinner({
+    message: "Resolving licenses...",
+    color: "yellow",
+  });
+  spinner.start();
+
   const groupedByRepo = new Map<string, PkgResolved[]>();
 
-  for (const pkg of normalizedAndResolved) {
+  for (const pkg of pkgs) {
+    if (pkg.owner && pkg.repo) {
+      if (groupedByRepo.has(`${pkg.owner}/${pkg.repo}`)) {
+        const existingPkgs = groupedByRepo.get(`${pkg.owner}/${pkg.repo}`) ??
+          [];
+        groupedByRepo.set(`${pkg.owner}/${pkg.repo}`, [
+          ...existingPkgs,
+          { ...pkg, license: existingPkgs[0]?.license },
+        ]);
+      } else {
+        spinner.message = `Fetching license from ${pkg.owner}/${pkg.repo}`;
+        groupedByRepo.set(`${pkg.owner}/${pkg.repo}`, [{
+          ...pkg,
+          license: await Api.fetchLicenseName({
+            owner: pkg.owner,
+            repo: pkg.repo,
+          }) ?? undefined,
+        }]);
+      }
+    }
+  }
+
+  spinner.stop();
+
+  return Array.from(groupedByRepo.values()).flat();
+};
+
+/** @internal */
+export const resolveAdvisories = async (
+  pkgs: PkgResolved[],
+): Promise<PkgResolved[]> => {
+  const spinner = new Spinner({
+    message: "Resolving advisories...",
+    color: "yellow",
+  });
+  spinner.start();
+
+  const groupedByRepo = new Map<string, PkgResolved[]>();
+
+  for (const pkg of pkgs) {
     if (pkg.owner && pkg.repo) {
       if (groupedByRepo.has(`${pkg.owner}/${pkg.repo}`)) {
         const existingPkgs = groupedByRepo.get(`${pkg.owner}/${pkg.repo}`) ??
@@ -58,10 +115,6 @@ export const resolve = async (
         groupedByRepo.set(`${pkg.owner}/${pkg.repo}`, [{
           ...pkg,
           advisories: await Api.fetchGithubAdvisories({
-            owner: pkg.owner,
-            repo: pkg.repo,
-          }) ?? undefined,
-          license: await Api.fetchLicenseName({
             owner: pkg.owner,
             repo: pkg.repo,
           }) ?? undefined,
