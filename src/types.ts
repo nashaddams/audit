@@ -27,8 +27,8 @@ export type JsrPkg = {
   } | null;
 };
 
-/** @internal */
 // All modules on deno.land/x need to be hosted as public repositories on GitHub.com.
+/** @internal */
 export type DenolandPkg = {
   upload_options: {
     type: string;
@@ -38,6 +38,7 @@ export type DenolandPkg = {
 };
 
 // See https://github.com/octokit/plugin-rest-endpoint-methods.js/#typescript
+// and https://docs.github.com/en/rest/security-advisories/repository-advisories#list-repository-security-advisories
 /** @internal */
 export type GithubAdvisories =
   RestEndpointMethodTypes["securityAdvisories"]["listRepositoryAdvisories"][
