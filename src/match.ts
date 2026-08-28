@@ -36,7 +36,7 @@ export const match = (pkgs: PkgResolved[]): PkgResolved[] => {
 
           if (!version) {
             console.warn(
-              `Unable to parse version for ${pkg.name}@${pkg.version}`,
+              `\nUnable to parse version for ${pkg.name}@${pkg.version}`,
             );
             return undefined;
           }
