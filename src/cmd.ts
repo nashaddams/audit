@@ -17,7 +17,7 @@ const runCommand = (
   };
 };
 
-/** @internal*/
+/** @internal */
 export const Cmd = {
   npmInstall: ({ outputDir }: { outputDir: string }): { stderr: string } => {
     const { stderr } = runCommand("npm", [
@@ -25,7 +25,6 @@ export const Cmd = {
       "--prefix",
       outputDir,
       "--package-lock-only",
-      "--silent",
     ]);
 
     return { stderr };
