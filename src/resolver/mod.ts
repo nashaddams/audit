@@ -11,10 +11,10 @@ export const resolvers = [
 ] as const;
 
 /** @internal */
-export const ResolverRegistry: Record<
-  typeof resolvers[number],
-  Resolver<typeof resolvers[number]>
-> = {
+export type ResolverName = typeof resolvers[number];
+
+/** @internal */
+export const ResolverRegistry: Record<ResolverName, Resolver<ResolverName>> = {
   [DenoLockResolver.name]: DenoLockResolver,
   [PackageLockResolver.name]: PackageLockResolver,
   [BunLockResolver.name]: BunLockResolver,
