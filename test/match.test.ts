@@ -1,7 +1,23 @@
 import { assertEquals } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 import { match } from "../src/match.ts";
-import { createVulnPkg } from "./utils.ts";
+import { builder } from "./utils/builder.ts";
+import type { PkgResolved } from "../src/types.ts";
+
+const createVulnPkg = (
+  pkgVersion: string,
+  ...vulnVersions: string[]
+): PkgResolved => {
+  const b = builder()
+    .withPackage({ version: pkgVersion })
+    .withAdvisory();
+
+  for (const vulnVersion of vulnVersions) {
+    b.withVulnerability({ vulnerable_version_range: vulnVersion });
+  }
+
+  return b.build()[0] as PkgResolved;
+};
 
 describe("match versions", () => {
   it("should match for equal versions", () => {

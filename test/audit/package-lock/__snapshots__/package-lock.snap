@@ -9,13 +9,13 @@ snapshot[`package-lock 1`] = `
 Title: Bypass CSRF Middleware by a request without Content-Type header
 Severity: medium
 Published: 2024-10-15
-Details: https://github.com
-CVE: CVE-2024-48913
+Details: https://github.com/advisories
+CVE: CVE-2049-12345
 CWE: CWE-352: Cross-Site Request Forgery (CSRF)
-GHSA: GHSA-2234-fmw7-43wr
+GHSA: GHSA-1234-asd7-89fg
 
 Affected package: axios (npm)
-Affected versions: >=1.8.3
+Affected versions: >=0.1.0
 Patched versions: N/A
 \`\`\`
 
@@ -25,13 +25,13 @@ Patched versions: N/A
 Title: Bypass CSRF Middleware by a request without Content-Type header
 Severity: medium
 Published: 2024-10-15
-Details: https://github.com
-CVE: CVE-2024-48913
+Details: https://github.com/advisories
+CVE: CVE-2049-12345
 CWE: CWE-352: Cross-Site Request Forgery (CSRF)
-GHSA: GHSA-2234-fmw7-43wr
+GHSA: GHSA-1234-asd7-89fg
 
 Affected package: @std/collections (other)
-Affected versions: >=1.0.10
+Affected versions: >=0.1.0
 Patched versions: N/A
 \`\`\`
 "
