@@ -1,42 +1,29 @@
 import type { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
+/** @internal*/
 export const severities = ["low", "moderate", "high", "critical"] as const;
 
+/** @internal*/
 export type Severity = typeof severities[number];
 
-export type OutOptions = {
-  dir: string;
-};
-
-export type Lock = {
-  jsr: Record<string, unknown>;
-  npm: Record<string, unknown>;
-  remote: Record<string, unknown>;
-};
-
+/** @internal*/
 export type Package = {
   name: string;
   version: string;
 };
 
-export type ExtractPackages = (
-  lockFile: string,
-  options: { verbose?: boolean; silent?: boolean },
-) => {
-  jsr: Package[];
-  npm: Package[];
-  esm: Package[];
-};
-
+/** @internal*/
 export type RunAudit = (
   packages: Package[],
   options: {
     severity: Severity;
-    silent?: boolean;
+    silent: boolean;
+    outputDir: string;
   },
 ) => number | Promise<number>;
 
 // See https://github.com/jsr-io/jsr/blob/main/frontend/utils/api.ts
+/** @internal*/
 export type JsrPackage = {
   githubRepository: {
     owner: string;
@@ -45,12 +32,14 @@ export type JsrPackage = {
 };
 
 // See https://github.com/octokit/plugin-rest-endpoint-methods.js/#typescript
+/** @internal*/
 export type GitHubAdvisories =
   RestEndpointMethodTypes["securityAdvisories"]["listRepositoryAdvisories"][
     "response"
   ]["data"];
 
 // Inferred from `npm audit --json` output
+/** @internal*/
 export type NpmAuditResult = {
   auditReportVersion: number;
   vulnerabilities?: {

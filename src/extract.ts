@@ -1,5 +1,11 @@
-import { deduplicate } from "./util.ts";
-import type { ExtractPackages, Lock, Package } from "./types.ts";
+import type { Package } from "./types.ts";
+
+const deduplicate = (a: Package[]): Package[] => {
+  return a.filter((o, index, arr) =>
+    arr.findIndex((item) => JSON.stringify(item) === JSON.stringify(o)) ===
+      index
+  );
+};
 
 const extractKeys = (obj?: { [key: string]: unknown }): string[] => {
   return obj ? Object.keys(obj) : [];
@@ -34,11 +40,20 @@ const normalizeEsmKeys = (keys: string[]): Package[] => {
   }));
 };
 
-export const extractPackages: ExtractPackages = (
-  lockFile,
-  { verbose, silent },
-) => {
-  const lock: Lock = JSON.parse(Deno.readTextFileSync(lockFile));
+/** @internal*/
+export const extractPackages = (
+  lockFile: string,
+  { verbose, silent }: { verbose?: boolean; silent?: boolean },
+): {
+  jsr: Package[];
+  npm: Package[];
+  esm: Package[];
+} => {
+  const lock: {
+    jsr: Record<string, unknown>;
+    npm: Record<string, unknown>;
+    remote: Record<string, unknown>;
+  } = JSON.parse(Deno.readTextFileSync(lockFile));
 
   const jsrKeys = extractKeys(lock.jsr);
   const npmKeys = extractKeys(lock.npm);

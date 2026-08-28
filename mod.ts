@@ -1,8 +1,7 @@
-import { audit, runAudit } from "./src/audit.ts";
+import { audit, type AuditOptions, runAudit } from "./src/audit.ts";
 
 if (import.meta.main) {
   runAudit();
 }
 
-export { audit };
-export default audit;
+export { audit, type AuditOptions, runAudit };

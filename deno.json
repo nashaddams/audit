@@ -1,6 +1,6 @@
 {
   "name": "@nashaddams/audit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "license": "MIT",
   "exports": "./mod.ts",
   "imports": {
@@ -15,7 +15,8 @@
   "tasks": {
     "build": "deno compile -RW -N=api.jsr.io,api.github.com --allow-run=\"npm\" -o dist/audit mod.ts",
     "run": "deno run -RW -N=api.jsr.io,api.github.com --allow-run=\"npm\" mod.ts",
-    "test": "deno test -RW --allow-run=\"npm\""
+    "test": "deno test -RW --allow-run=\"npm\"",
+    "doc": "deno doc --html mod.ts"
   },
   "lock": false
 }

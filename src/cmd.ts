@@ -1,5 +1,4 @@
 import type { Severity } from "./types.ts";
-import { OUT_DIR } from "./util.ts";
 
 const runCommand = (
   command: string,
@@ -18,12 +17,13 @@ const runCommand = (
   };
 };
 
+/** @internal*/
 export const Cmd = {
-  npmInstall: (): { stderr: string } => {
+  npmInstall: ({ outputDir }: { outputDir: string }): { stderr: string } => {
     const { stderr } = runCommand("npm", [
       "install",
       "--prefix",
-      OUT_DIR,
+      outputDir,
       "--package-lock-only",
       "--silent",
     ]);
@@ -31,12 +31,12 @@ export const Cmd = {
     return { stderr };
   },
   npmAudit: (
-    { severity }: { severity: Severity },
+    { outputDir, severity }: { outputDir: string; severity: Severity },
   ): { code: number; stdout: string; stderr: string } => {
     const { code, stdout, stderr } = runCommand("npm", [
       "audit",
       "--prefix",
-      OUT_DIR,
+      outputDir,
       "--audit-level",
       severity,
       "--json",

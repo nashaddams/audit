@@ -1,5 +1,6 @@
 import type { GitHubAdvisories, JsrPackage } from "./types.ts";
 
+/** @internal*/
 export const Api = {
   fetchJsrPackage: async (
     { jsrScope, jsrPackage }: { jsrScope: string; jsrPackage: string },

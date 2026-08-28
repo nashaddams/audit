@@ -1,6 +1,5 @@
 import { Spinner } from "@std/cli/unstable-spinner";
 import type { NpmAuditResult, Package, RunAudit } from "./types.ts";
-import { fallback, writeFileToOutDir } from "./util.ts";
 import { Cmd } from "./cmd.ts";
 
 const createPackageJson = (packages: Package[]): string => {
@@ -18,6 +17,8 @@ const createPackageJson = (packages: Package[]): string => {
 };
 
 const createReport = (npmAuditResult: NpmAuditResult): string => {
+  const fallback = "N/A";
+
   return [
     "# Audit report (NPM/ESM)",
     "",
@@ -64,7 +65,11 @@ const createReport = (npmAuditResult: NpmAuditResult): string => {
   ].join("\n");
 };
 
-export const auditNpm: RunAudit = async (packages, { severity, silent }) => {
+/** @internal*/
+export const auditNpm: RunAudit = async (
+  packages,
+  { severity, silent, outputDir },
+) => {
   if (packages.length > 0) {
     const spinner = new Spinner({
       message: "Running NPM/ESM audit ...",
@@ -73,13 +78,16 @@ export const auditNpm: RunAudit = async (packages, { severity, silent }) => {
     spinner.start();
     await new Promise((r) => setTimeout(r, 182)); // Ensure spinner is shown
 
-    writeFileToOutDir("package.json", createPackageJson(packages));
+    Deno.writeTextFileSync(
+      `${outputDir}/package.json`,
+      createPackageJson(packages),
+    );
 
-    const { stderr: stderrInstall } = Cmd.npmInstall();
+    const { stderr: stderrInstall } = Cmd.npmInstall({ outputDir });
 
     if (stderrInstall) console.error(`\n${stderrInstall}`);
 
-    const { code, stdout, stderr } = Cmd.npmAudit({ severity });
+    const { code, stdout, stderr } = Cmd.npmAudit({ outputDir, severity });
 
     spinner.stop();
 
@@ -94,7 +102,8 @@ export const auditNpm: RunAudit = async (packages, { severity, silent }) => {
       ) {
         const report = createReport(auditJson);
 
-        writeFileToOutDir(`audit-npm-report.md`, report);
+        Deno.writeTextFileSync(`${outputDir}/audit-npm-report.md`, report);
+
         if (!silent) console.info(`\n${report}`);
       } else {
         if (!silent) console.info("No vulnerabilities found.");
