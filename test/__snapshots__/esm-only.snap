@@ -1,9 +1,11 @@
 export const snapshot = {};
 
 snapshot[`ESM only 1`] = `
-"# Audit report (NPM/ESM)
+"# Audit report
 
-## handlebars
+## NPM/ESM
+
+### handlebars
 
 Severity: critical | Affected versions: <=4.7.6 | Patched versions: 4.7.8
 
@@ -26,7 +28,7 @@ Affected versions: <4.7.7
 Patched versions: 4.7.8
 \`\`\`
 
-## minimist
+### minimist
 
 Severity: critical | Affected versions: <=0.2.3 | Patched versions: 4.7.8
 
@@ -49,7 +51,7 @@ Affected versions: <0.2.4
 Patched versions: 4.7.8
 \`\`\`
 
-## optimist
+### optimist
 
 Severity: critical | Affected versions: >=0.6.0 | Patched versions: 4.7.8
 

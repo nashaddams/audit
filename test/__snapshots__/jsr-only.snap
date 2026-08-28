@@ -1,34 +1,11 @@
 export const snapshot = {};
 
 snapshot[`JSR only 1`] = `
-"# Audit report (JSR)
+"# Audit report
 
-## @logtape/logtape (0.8.0)
+## JSR
 
-\`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-GHSA: GHSA-32fx-h446-h8pf
-
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
-\`\`\`
-\`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-GHSA: GHSA-32fx-h446-h8pf
-
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
-\`\`\`
-
-## @nashaddams/amqp (1.0.0)
+### @logtape/logtape (0.8.0)
 
 \`\`\`
 Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
@@ -53,7 +30,7 @@ Affected versions: <= 1.0.10
 Patched versions: 1.0.11
 \`\`\`
 
-## @std/bytes (1.0.4)
+### @nashaddams/amqp (1.0.0)
 
 \`\`\`
 Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
@@ -78,7 +55,32 @@ Affected versions: <= 1.0.10
 Patched versions: 1.0.11
 \`\`\`
 
-## @std/io (0.225.0)
+### @std/bytes (1.0.4)
+
+\`\`\`
+Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
+Severity: low
+Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
+CVE: CVE-2024-52793
+GHSA: GHSA-32fx-h446-h8pf
+
+Affected package: @std/http (other)
+Affected versions: <= 1.0.10
+Patched versions: 1.0.11
+\`\`\`
+\`\`\`
+Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
+Severity: low
+Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
+CVE: CVE-2024-52793
+GHSA: GHSA-32fx-h446-h8pf
+
+Affected package: @std/http (other)
+Affected versions: <= 1.0.10
+Patched versions: 1.0.11
+\`\`\`
+
+### @std/io (0.225.0)
 
 \`\`\`
 Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems

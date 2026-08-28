@@ -1,6 +1,7 @@
 import { Command, EnumType } from "@cliffy/command";
 import denoJson from "../deno.json" with { type: "json" };
 import { severities, type Severity } from "./types.ts";
+import { File } from "./file.ts";
 import { extractPackages } from "./extract.ts";
 import { auditJsr } from "./audit-jsr.ts";
 import { auditNpm } from "./audit-npm.ts";
@@ -50,6 +51,10 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 
   Deno.mkdirSync(outputDir);
 
+  const reportHeader = "# Audit report\n";
+  File.writeReport(outputDir, reportHeader);
+  File.writeReportHtml(outputDir, reportHeader);
+
   if (!silent) {
     console.info(`Using lock file: %c${lock}\n`, "font-weight: bold");
   }
@@ -86,14 +91,42 @@ export const runAudit = async (): Promise<void> => {
       "The minimum severity of an advisory vulnerability (only affects the return code)",
       { default: DEFAULT_SEVERITY },
     )
-    .option("-v, --verbose", "Verbose output.", { default: DEFAULT_VERBOSITY })
-    .option("--silent", "Mute output.", { default: DEFAULT_SILENCE })
+    .option("-v, --verbose", "Verbose console output.", {
+      default: DEFAULT_VERBOSITY,
+    })
+    .option("--silent", "Mute console output.", {
+      default: DEFAULT_SILENCE,
+    })
     .option("-o, --output-dir <output-dir:file>", "Output directory", {
       default: DEFAULT_OUTPUT_DIR,
     })
     .action(async ({ lock, severity, verbose, silent, outputDir }) => {
       const code = await audit({ lock, severity, verbose, silent, outputDir });
       Deno.exit(code);
+    })
+    .command("report", "Serve the generated audit reports")
+    .option("-o, --output-dir <output-dir:file>", "Output directory", {
+      default: DEFAULT_OUTPUT_DIR,
+    })
+    .action(({ outputDir }) => {
+      try {
+        const auditHtml = Deno.readFileSync(".audit/report.html");
+        Deno.serve(
+          {
+            port: 0,
+            hostname: "0.0.0.0",
+            onListen: (({ port, hostname }) => {
+              console.info(
+                `Serving audit report at http://${hostname}:${port}/`,
+              );
+            }),
+          },
+          () => new Response(auditHtml),
+        );
+      } catch (err) {
+        console.info(`No audit report found in ${outputDir}`);
+        if (!(err instanceof Deno.errors.NotFound)) throw err;
+      }
     })
     .parse();
 };

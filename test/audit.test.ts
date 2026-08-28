@@ -32,14 +32,10 @@ describe("audit", () => {
       severity: "low",
       silent: true,
     });
-    await assertSnapshot(
-      t,
-      Deno.readTextFileSync(".audit/audit-jsr-report.md"),
-      {
-        name: "JSR only",
-        path: `${import.meta.dirname}/__snapshots__/jsr-only.snap`,
-      },
-    );
+    await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {
+      name: "JSR only",
+      path: `${import.meta.dirname}/__snapshots__/jsr-only.snap`,
+    });
   });
 
   it("should audit NPM packages", async (t) => {
@@ -55,14 +51,10 @@ describe("audit", () => {
       silent: true,
     });
 
-    await assertSnapshot(
-      t,
-      Deno.readTextFileSync(".audit/audit-npm-report.md"),
-      {
-        name: "NPM only",
-        path: `${import.meta.dirname}/__snapshots__/npm-only.snap`,
-      },
-    );
+    await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {
+      name: "NPM only",
+      path: `${import.meta.dirname}/__snapshots__/npm-only.snap`,
+    });
   });
 
   it("should audit ESM packages", async (t) => {
@@ -78,14 +70,10 @@ describe("audit", () => {
       silent: true,
     });
 
-    await assertSnapshot(
-      t,
-      Deno.readTextFileSync(".audit/audit-npm-report.md"),
-      {
-        name: "ESM only",
-        path: `${import.meta.dirname}/__snapshots__/esm-only.snap`,
-      },
-    );
+    await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {
+      name: "ESM only",
+      path: `${import.meta.dirname}/__snapshots__/esm-only.snap`,
+    });
   });
 
   it("should audit all packages", async (t) => {
@@ -101,22 +89,9 @@ describe("audit", () => {
       silent: true,
     });
 
-    await assertSnapshot(
-      t,
-      Deno.readTextFileSync(".audit/audit-jsr-report.md"),
-      {
-        name: "All (JSR)",
-        path: `${import.meta.dirname}/__snapshots__/all.snap`,
-      },
-    );
-
-    await assertSnapshot(
-      t,
-      Deno.readTextFileSync(".audit/audit-npm-report.md"),
-      {
-        name: "All (NPM/ESM)",
-        path: `${import.meta.dirname}/__snapshots__/all.snap`,
-      },
-    );
+    await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {
+      name: "All",
+      path: `${import.meta.dirname}/__snapshots__/all.snap`,
+    });
   });
 });
