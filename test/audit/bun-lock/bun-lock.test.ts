@@ -14,6 +14,7 @@ describe("[audit] bun-lock", () => {
     using _ = Stub.fetchNpmPkg;
     using __ = Stub.fetchJsrPkg;
     using ___ = Stub.fetchGithubAdvisories;
+    using ____ = Stub.fetchLiceseName;
 
     const code = await audit({
       lockFile: "test/audit/bun-lock/bun.lock",

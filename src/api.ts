@@ -39,7 +39,10 @@ type Api = {
   fetchGithubAdvisories: (
     options: { owner: string; repo: string },
   ) => Promise<GithubAdvisories | null>;
-  fetchLicense: (
+  fetchLicenseName: (
+    options: { owner?: string; repo?: string },
+  ) => Promise<string | null>;
+  fetchLicenseText: (
     options: { owner?: string; repo?: string },
   ) => Promise<string | null>;
 };
@@ -142,9 +145,36 @@ export const Api: Api = {
       return null;
     }
   },
-  fetchLicense: async (
-    { owner, repo },
-  ) => {
+  fetchLicenseName: async ({ owner, repo }) => {
+    const res = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/license`,
+      {
+        headers: {
+          "Accept": "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+          ...(Env.GITHUB_TOKEN
+            ? {
+              "Authorization": `Bearer ${Env.GITHUB_TOKEN}`,
+            }
+            : {}),
+        },
+      },
+    );
+
+    try {
+      const json = await res.json();
+
+      if (!res.ok) {
+        throw new Error(JSON.stringify(json, null, 2));
+      }
+
+      return json.license?.name ?? null;
+    } catch (err) {
+      console.warn(`\nUnable to fetch license name from ${owner}/${repo}`, err);
+      return null;
+    }
+  },
+  fetchLicenseText: async ({ owner, repo }) => {
     const res = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/license`,
       {
@@ -169,7 +199,7 @@ export const Api: Api = {
 
       return license;
     } catch (err) {
-      console.warn(`\nUnable to fetch license from ${owner}/${repo}`, err);
+      console.warn(`\nUnable to fetch license text from ${owner}/${repo}`, err);
       return null;
     }
   },

@@ -10,7 +10,7 @@ import { File } from "./file.ts";
 import { Report } from "./report.ts";
 import { resolve } from "./resolve.ts";
 import { match } from "./match.ts";
-import { fetchLicenses } from "./license.ts";
+import { fetchLicenseTexts } from "./license.ts";
 
 const DEFAULT_LOCK_FILE: string = `${Deno.cwd()}/deno.lock`;
 const DEFAULT_SEVERITY: Severity = "medium";
@@ -208,7 +208,7 @@ export const runAudit = async (args: string[] = Deno.args): Promise<void> => {
       const resolvedPkgs = File.readResolvedPackages();
 
       if (resolvedPkgs !== null) {
-        await fetchLicenses(resolvedPkgs, { merge });
+        await fetchLicenseTexts(resolvedPkgs, { merge });
       }
     })
     .parse(args);

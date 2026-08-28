@@ -57,4 +57,9 @@ export const Stub = {
       }
     },
   ),
+  fetchLiceseName: stub(
+    Api,
+    "fetchLicenseName",
+    async () => await Promise.resolve(null),
+  ),
 };

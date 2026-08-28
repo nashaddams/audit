@@ -47,15 +47,21 @@ export const resolve = async (
   for (const pkg of normalizedAndResolved) {
     if (pkg.owner && pkg.repo) {
       if (groupedByRepo.has(`${pkg.owner}/${pkg.repo}`)) {
+        const existingPkgs = groupedByRepo.get(`${pkg.owner}/${pkg.repo}`) ??
+          [];
         groupedByRepo.set(`${pkg.owner}/${pkg.repo}`, [
-          ...groupedByRepo.get(`${pkg.owner}/${pkg.repo}`)!,
-          pkg,
+          ...existingPkgs,
+          { ...pkg, license: existingPkgs[0]?.license },
         ]);
       } else {
         spinner.message = `Fetching advisories from ${pkg.owner}/${pkg.repo}`;
         groupedByRepo.set(`${pkg.owner}/${pkg.repo}`, [{
           ...pkg,
           advisories: await Api.fetchGithubAdvisories({
+            owner: pkg.owner,
+            repo: pkg.repo,
+          }) ?? undefined,
+          license: await Api.fetchLicenseName({
             owner: pkg.owner,
             repo: pkg.repo,
           }) ?? undefined,

@@ -10,7 +10,7 @@ const deduplicate = (pkgs: (Pkg & GithubInfo)[]): (Pkg & GithubInfo)[] => {
 };
 
 /** @internal */
-export const fetchLicenses = async (
+export const fetchLicenseTexts = async (
   pkgs: PkgResolved[],
   { merge }: { merge?: boolean },
 ) => {
@@ -44,7 +44,7 @@ export const fetchLicenses = async (
     for (const { owner, repo, name, version } of pkgRepos) {
       spinner.message = `Fetching license for ${owner}/${repo}`;
 
-      const license = await Api.fetchLicense({ owner, repo });
+      const license = await Api.fetchLicenseText({ owner, repo });
 
       if (license !== null) {
         Deno.writeTextFileSync(

@@ -15,6 +15,7 @@ describe("[audit] deno-lock", () => {
     using __ = Stub.fetchDenolandPkg;
     using ___ = Stub.fetchNpmPkg;
     using ____ = Stub.fetchGithubAdvisories;
+    using _____ = Stub.fetchLiceseName;
 
     const code = await audit({
       lockFile: "test/audit/deno-lock/deno.lock",
