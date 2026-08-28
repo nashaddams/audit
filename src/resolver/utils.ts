@@ -51,6 +51,30 @@ export const inferNameAndVersion = (key: string): Pkg | null => {
   };
 };
 
+/**
+ * Infer the owner and repository from Github URLs.
+ *
+ * @internal
+ */
+export const inferOwnerAndRepoFromGithubUrl = (url?: string) => {
+  const [owner, repo] = url
+    ?.replace("git+https://", "")
+    .replace("git+ssh://git@", "")
+    .replace("git://", "")
+    .replace("https://", "")
+    .replace("github.com/", "")
+    .replace(".git#main", "")
+    .replace(".git", "")
+    .split(
+      "/",
+    ) ?? [undefined, undefined];
+
+  return {
+    owner,
+    repo,
+  };
+};
+
 /** @internal */
 export const resolveJsrRepo: Resolver["origins"][number]["resolveGithubRepo"] =
   async ({ name }) => {
@@ -83,19 +107,5 @@ export const resolveDenolandRepo:
 export const resolveNpmRepo: Resolver["origins"][number]["resolveGithubRepo"] =
   async ({ name }) => {
     const npmPkg = await Api.fetchNpmPkg({ pkg: name });
-    const repoUrl = npmPkg?.repository?.url;
-    const [owner, repo] = repoUrl
-      ?.replace("https://github.com/", "")
-      .replace("git+", "")
-      .replace(".git", "")
-      .replace("git:", "")
-      .replace("#main", "")
-      .split(
-        "/",
-      ) ?? [undefined, undefined];
-
-    return {
-      owner,
-      repo,
-    };
+    return inferOwnerAndRepoFromGithubUrl(npmPkg?.repository?.url);
   };
