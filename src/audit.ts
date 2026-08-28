@@ -12,6 +12,7 @@ const DEFAULT_IGNORE: string[] = [];
 const DEFAULT_VERBOSITY: boolean = false;
 const DEFAULT_SILENCE: boolean = false;
 const DEFAULT_OUTPUT_DIR: string = `${Deno.cwd()}/.audit`;
+const DEFAULT_GITHUB_TOKEN: string | undefined = Deno.env.get("GITHUB_TOKEN");
 
 /** Options for the {@link audit} function. */
 export type AuditOptions = {
@@ -27,6 +28,8 @@ export type AuditOptions = {
   silent?: boolean;
   /** Output directory (default: `.audit`) */
   outputDir?: string;
+  /** Token for authenticated GitHub API requests (default: `undefined`) */
+  githubToken?: string;
 };
 
 /**
@@ -43,6 +46,7 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
     verbose = DEFAULT_VERBOSITY,
     silent = DEFAULT_SILENCE,
     outputDir = DEFAULT_OUTPUT_DIR,
+    githubToken = DEFAULT_GITHUB_TOKEN,
   }: AuditOptions = options ?? {};
 
   try {
@@ -67,7 +71,12 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
     silent,
   });
 
-  const jsrAuditCode = await auditJsr(jsr, { severity, silent, outputDir });
+  const jsrAuditCode = await auditJsr(jsr, {
+    severity,
+    silent,
+    outputDir,
+    githubToken,
+  });
   const npmAuditCode = await auditNpm([...npm, ...esm], {
     severity,
     silent,
@@ -90,6 +99,10 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
     )
     .version(denoJson.version)
     .type("severity", new EnumType(severities))
+    .env(
+      "GITHUB_TOKEN=<token:string>",
+      "Token for authenticated GitHub API requests.",
+    )
     .group("Audit options")
     .option("-l, --lock <lock-file:file>", "Deno lock file (v4) to audit.", {
       default: DEFAULT_LOCK_FILE,
@@ -118,17 +131,22 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
     .option("-o, --output-dir <output-dir:file>", "Output directory.", {
       default: DEFAULT_OUTPUT_DIR,
     })
-    .action(async ({ lock, severity, ignore, verbose, silent, outputDir }) => {
-      const code = await audit({
-        lock,
-        severity,
-        ignore,
-        verbose,
-        silent,
-        outputDir,
-      });
-      Deno.exit(code);
-    })
+    .action(
+      async (
+        { lock, severity, ignore, verbose, silent, outputDir, githubToken },
+      ) => {
+        const code = await audit({
+          lock,
+          severity,
+          ignore,
+          verbose,
+          silent,
+          outputDir,
+          githubToken,
+        });
+        Deno.exit(code);
+      },
+    )
     .command("report", "Serve the generated audit report.")
     .option("-o, --output-dir <output-dir:file>", "Output directory", {
       default: DEFAULT_OUTPUT_DIR,

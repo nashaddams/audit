@@ -12,7 +12,7 @@ import { npmAuditEsmOnly } from "./mock/npm-audit-esm-only.ts";
 
 describe("audit", () => {
   let fetchJsrPkgStub: Stub | undefined = undefined;
-  let fetchGitHubAdvisoriesStub: Stub | undefined = undefined;
+  let fetchGithubAdvisoriesStub: Stub | undefined = undefined;
   let npmInstallStub: Stub | undefined = undefined;
   let npmAuditStub: Stub | undefined = undefined;
 
@@ -22,9 +22,9 @@ describe("audit", () => {
       "fetchJsrPkg",
       async () => await Promise.resolve(jsrPkg),
     );
-    fetchGitHubAdvisoriesStub = stub(
+    fetchGithubAdvisoriesStub = stub(
       Api,
-      "fetchGitHubAdvisories",
+      "fetchGithubAdvisories",
       async () => await Promise.resolve(githubAdvisories),
     );
     npmInstallStub = stub(
@@ -38,8 +38,8 @@ describe("audit", () => {
     if (fetchJsrPkgStub && !fetchJsrPkgStub.restored) {
       fetchJsrPkgStub.restore();
     }
-    if (fetchGitHubAdvisoriesStub && !fetchGitHubAdvisoriesStub.restored) {
-      fetchGitHubAdvisoriesStub.restore();
+    if (fetchGithubAdvisoriesStub && !fetchGithubAdvisoriesStub.restored) {
+      fetchGithubAdvisoriesStub.restore();
     }
     if (npmInstallStub && !npmInstallStub.restored) {
       npmInstallStub.restore();

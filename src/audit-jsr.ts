@@ -1,6 +1,6 @@
 import { Spinner } from "@std/cli/unstable-spinner";
 import { intersect } from "@std/collections/intersect";
-import type { GitHubAdvisories, Pkg, RunAudit, Severity } from "./types.ts";
+import type { GithubAdvisories, Pkg, RunAudit, Severity } from "./types.ts";
 import { Api } from "./api.ts";
 import { File } from "./file.ts";
 
@@ -13,7 +13,7 @@ const inferSeverities = (severity: Severity): Severity[] => {
 
 const createReport = (pkgAdvisories: {
   pkg: Pkg;
-  advisories: GitHubAdvisories;
+  advisories: GithubAdvisories;
 }[]): string => {
   const fallback = "N/A";
 
@@ -58,7 +58,7 @@ const createReport = (pkgAdvisories: {
 /** @internal */
 export const auditJsr: RunAudit = async (
   pkgs,
-  { severity, silent, outputDir },
+  { severity, silent, outputDir, githubToken },
 ) => {
   if (pkgs.length > 0) {
     const spinner = new Spinner({
@@ -67,16 +67,17 @@ export const auditJsr: RunAudit = async (
     });
     spinner.start();
 
-    const pkgAdvisories: { pkg: Pkg; advisories: GitHubAdvisories }[] = [];
+    const pkgAdvisories: { pkg: Pkg; advisories: GithubAdvisories }[] = [];
 
     for (const { name, version } of pkgs) {
       const [scope, pkg] = name.slice(1).split("/");
       const jsrPkg = await Api.fetchJsrPkg({ scope, pkg });
 
       if (jsrPkg?.githubRepository) {
-        const advisories = await Api.fetchGitHubAdvisories({
+        const advisories = await Api.fetchGithubAdvisories({
           owner: jsrPkg.githubRepository.owner,
           repo: jsrPkg.githubRepository.name,
+          githubToken,
         });
 
         if (advisories?.length) {

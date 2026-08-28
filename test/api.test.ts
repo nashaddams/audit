@@ -33,7 +33,7 @@ describe("api", () => {
   });
 
   it("should fetch GitHub security advisories", async () => {
-    const advisories = await Api.fetchGitHubAdvisories({
+    const advisories = await Api.fetchGithubAdvisories({
       owner: "nashaddams",
       repo: "audit",
     });
@@ -42,7 +42,7 @@ describe("api", () => {
   });
 
   it("should return null for a non-existent Github repository", async () => {
-    const advisories = await Api.fetchGitHubAdvisories({
+    const advisories = await Api.fetchGithubAdvisories({
       owner: "nashaddams",
       repo: "audittt",
     });

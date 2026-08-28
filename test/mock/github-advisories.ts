@@ -1,6 +1,6 @@
-import type { GitHubAdvisories } from "../../src/types.ts";
+import type { GithubAdvisories } from "../../src/types.ts";
 
-export const githubAdvisories: GitHubAdvisories = [{
+export const githubAdvisories: GithubAdvisories = [{
   ghsa_id: "GHSA-32fx-h446-h8pf",
   cve_id: "CVE-2024-52793",
   html_url:
