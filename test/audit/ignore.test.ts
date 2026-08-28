@@ -65,7 +65,7 @@ describe("[audit] ignore", () => {
       },
     );
 
-    const code = await audit({ lock: "test/audit/examples/jsr/deno.lock" });
+    const code = await audit({ lockFile: "test/audit/examples/jsr/deno.lock" });
     assertEquals(code, 0);
 
     await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {

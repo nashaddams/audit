@@ -1,5 +1,4 @@
 import { CSS, render } from "@deno/gfm";
-import { join } from "@std/path";
 import type { PkgResolved } from "./types.ts";
 
 /** @internal */
@@ -11,10 +10,10 @@ export type Config = {
 
 /** @internal */
 export const File = {
-  readConfig: (): Config => {
+  readConfig: (configFile: string): Config => {
     try {
       return JSON.parse(
-        Deno.readTextFileSync(join(Deno.cwd(), "audit.json")),
+        Deno.readTextFileSync(configFile),
       ) as Config;
     } catch {
       return {};
@@ -22,7 +21,7 @@ export const File = {
   },
   writePackages: (outputDir: string, pkgs: PkgResolved[]): void => {
     Deno.writeTextFileSync(
-      `${outputDir}/packages.json`,
+      `${outputDir}/resolved-packages.json`,
       JSON.stringify(
         pkgs.map((pkg) => ({
           origin: pkg.origin,
