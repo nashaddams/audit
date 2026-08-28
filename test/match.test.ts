@@ -1,54 +1,7 @@
 import { assertEquals } from "@std/assert";
 import { describe, it } from "@std/testing/bdd";
 import { match } from "../src/match.ts";
-import type { PkgResolved } from "../src/types.ts";
-
-const createVulnPkg = (
-  pkgVersion: string,
-  ...vulnVersions: string[]
-): PkgResolved => {
-  return {
-    origin: "",
-    name: "",
-    version: pkgVersion,
-    advisories: [{
-      "ghsa_id": "",
-      "cve_id": null,
-      "url": "",
-      "html_url": "",
-      "summary": "",
-      "description": null,
-      "severity": null,
-      "author": null,
-      "publisher": null,
-      "identifiers": [],
-      "state": "published",
-      "created_at": null,
-      "updated_at": null,
-      "published_at": null,
-      "closed_at": null,
-      "withdrawn_at": null,
-      "submission": null,
-      "vulnerabilities": vulnVersions.map((v) => ({
-        "package": {
-          "ecosystem": "other",
-          "name": null,
-        },
-        "vulnerable_version_range": v,
-        "patched_versions": null,
-        "vulnerable_functions": null,
-      })),
-      "cwes": null,
-      "cwe_ids": null,
-      "credits": null,
-      "credits_detailed": null,
-      "collaborating_users": null,
-      "collaborating_teams": null,
-      "private_fork": null,
-      "cvss": null,
-    }],
-  };
-};
+import { createVulnPkg } from "./utils.ts";
 
 describe("match versions", () => {
   it("should match for equal versions", () => {
@@ -107,6 +60,24 @@ describe("match version ranges", () => {
     assertEquals(matched.length, 1);
   });
 
+  it("should match for combined version ranges (comma, dash) 1", () => {
+    const pkg = createVulnPkg(
+      "7.25.9",
+      "<7.26.10, 8.0.0-alpha.0 - 8.0.0-alpha.16",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 1);
+  });
+
+  it("should match for combined version ranges (comma, dash) 2", () => {
+    const pkg = createVulnPkg(
+      "8.0.0-alpha.3",
+      "<7.26.10, 8.0.0-alpha.0 - 8.0.0-alpha.16",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 1);
+  });
+
   it("should not match for smaller version range", () => {
     const pkg = createVulnPkg("1.2.3", "< 1.2.3");
     const matched = match([pkg]);
@@ -125,7 +96,7 @@ describe("match version ranges", () => {
     assertEquals(matched.length, 0);
   });
 
-  it("should not match for multiple version ranges (or)", () => {
+  it("should not match for multiple version ranges (comma)", () => {
     const pkg = createVulnPkg("5.9.9", ">=6.0.0, <=6.0.8");
     const matched = match([pkg]);
     assertEquals(matched.length, 0);
@@ -133,6 +104,24 @@ describe("match version ranges", () => {
 
   it("should not match for prerelease version ranges", () => {
     const pkg = createVulnPkg("8.0.0-alpha.4", "8.0.0-alpha.0 - 8.0.0-alpha.3");
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+
+  it("should not match for combined version ranges (comma, dash) 1", () => {
+    const pkg = createVulnPkg(
+      "7.27.0",
+      "<7.26.10, 8.0.0-alpha.0 - 8.0.0-alpha.16",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+
+  it("should not match for combined version ranges (comma, dash) 2", () => {
+    const pkg = createVulnPkg(
+      "8.0.0-alpha.17",
+      "<7.26.10, 8.0.0-alpha.0 - 8.0.0-alpha.16",
+    );
     const matched = match([pkg]);
     assertEquals(matched.length, 0);
   });
