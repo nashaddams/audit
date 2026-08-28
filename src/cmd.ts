@@ -1,4 +1,4 @@
-import type { Severity } from "./types.ts";
+import type { Severity } from "./severity.ts";
 
 const runCommand = (
   command: string,

@@ -2,6 +2,7 @@ import { Spinner } from "@std/cli/unstable-spinner";
 import type { NpmAuditResult, Pkg, RunAudit } from "./types.ts";
 import { Cmd } from "./cmd.ts";
 import { File } from "./file.ts";
+import { Report } from "./report.ts";
 
 const createPackageJson = (pkgs: Pkg[]): string => {
   return [
@@ -14,55 +15,6 @@ const createPackageJson = (pkgs: Pkg[]): string => {
     }).join("\n"),
     "  }",
     "}",
-  ].join("\n");
-};
-
-const createReport = (npmAuditResult: NpmAuditResult): string => {
-  const fallback = "N/A";
-
-  return [
-    "\n## NPM/ESM",
-    "",
-    npmAuditResult.vulnerabilities
-      ? Object.values(npmAuditResult.vulnerabilities).flatMap(
-        (vulnerability) => {
-          return [
-            `### ${vulnerability.name ?? fallback}`,
-            "",
-            `Severity: ${
-              vulnerability.severity ?? fallback
-            } | Affected versions: ${
-              vulnerability.range ?? fallback
-            } | Patched versions: ${
-              vulnerability.fixAvailable?.version ?? fallback
-            }`,
-            "",
-            vulnerability.via?.filter((v) => typeof v !== "string").flatMap(
-              (via) => {
-                return [
-                  "```",
-                  `Title: ${via.title ?? fallback}`,
-                  `Severity: ${via.severity ?? fallback}`,
-                  `Details: ${via.url ?? fallback}`,
-                  "",
-                  `Affected package: ${via.name ?? fallback}${
-                    via.dependency && via.name !== via.dependency
-                      ? ` (${via.dependency})`
-                      : ""
-                  }`,
-                  `Affected versions: ${via.range ?? fallback}`,
-                  `Patched versions: ${
-                    vulnerability.fixAvailable?.version ?? fallback
-                  }`,
-                  "```",
-                ].join("\n");
-              },
-            ).join("\n"),
-            "",
-          ].join("\n");
-        },
-      ).join("\n")
-      : [].join("\n"),
   ].join("\n");
 };
 
@@ -98,13 +50,15 @@ export const auditNpm: RunAudit = async (
         auditJson.vulnerabilities &&
         Object.keys(auditJson.vulnerabilities).length > 0
       ) {
-        const reportString = createReport(auditJson);
+        const reportString = Report.createNpmAuditReport({
+          auditResult: auditJson,
+        });
 
         File.writeReport(outputDir, reportString);
 
         if (!silent) console.info(reportString);
       } else {
-        if (!silent) console.info("\nNo vulnerabilities found.");
+        if (!silent) console.info("\nNo NPM/ESM vulnerabilities found.");
       }
     }
 

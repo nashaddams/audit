@@ -32,6 +32,27 @@ describe("api", () => {
     assertEquals(pkg!.githubRepository, null);
   });
 
+  it("should fetch a deno.land package", async () => {
+    const pkg = await Api.fetchDenolandPkg({ pkg: "std", version: "0.214.0" });
+
+    assertObjectMatch(pkg!, {
+      upload_options: {
+        type: "github",
+        repository: "denoland/deno_std",
+        ref: "0.214.0",
+      },
+    });
+  });
+
+  it("should return null for a non-existent deno.land package", async () => {
+    const pkg = await Api.fetchDenolandPkg({
+      pkg: "stddd",
+      version: "0.214.0",
+    });
+
+    assertEquals(pkg, null);
+  });
+
   it("should fetch GitHub security advisories", async () => {
     const advisories = await Api.fetchGithubAdvisories({
       owner: "nashaddams",

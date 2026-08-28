@@ -1,9 +1,10 @@
 import { Command, EnumType } from "@cliffy/command";
 import denoJson from "../deno.json" with { type: "json" };
-import { severities, type Severity } from "./types.ts";
+import { severities, type Severity } from "./severity.ts";
 import { File } from "./file.ts";
 import { extractPackages } from "./extract.ts";
 import { auditJsr } from "./audit-jsr.ts";
+import { auditDenoland } from "./audit-denoland.ts";
 import { auditNpm } from "./audit-npm.ts";
 
 const DEFAULT_LOCK_FILE: string = "deno.lock";
@@ -65,13 +66,19 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
     console.info(`Using lock file: %c${lock}\n`, "font-weight: bold");
   }
 
-  const { jsr, npm, esm } = extractPackages(lock, {
+  const { jsr, npm, esm, denoland } = extractPackages(lock, {
     ignore,
     verbose,
     silent,
   });
 
   const jsrAuditCode = await auditJsr(jsr, {
+    severity,
+    silent,
+    outputDir,
+    githubToken,
+  });
+  const denolandAuditCode = await auditDenoland(denoland, {
     severity,
     silent,
     outputDir,
@@ -85,7 +92,7 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 
   File.generateHtmlReport(outputDir);
 
-  return jsrAuditCode || npmAuditCode;
+  return jsrAuditCode || denolandAuditCode || npmAuditCode;
 };
 
 /**

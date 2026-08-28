@@ -13,8 +13,8 @@ const extractKeys = (obj?: { [key: string]: unknown }): string[] => {
   return obj ? Object.keys(obj) : [];
 };
 
-const formatKeys = (keys: string[]): string => {
-  return keys.map((key) => ` > ${key}`).join("\n");
+const formatKeys = (keys: Pkg[]): string => {
+  return keys.map((key) => ` > ${key.name}@${key.version}`).join("\n");
 };
 
 const inferNameAndVersion = (key: string): Pkg => {
@@ -55,6 +55,21 @@ const normalizeEsmKeys = (keys: string[]): Pkg[] => {
   }));
 };
 
+const normalizeDenolandKeys = (keys: string[]): Pkg[] => {
+  return deduplicate(keys.map((key) => {
+    const { pathname } = new URL(key);
+    const { name, version } = inferNameAndVersion(pathname);
+
+    // deno.land keys may contain an `/x/` in the url
+    const sanitizedName = name.replace(/\/x/g, "");
+
+    return {
+      name: sanitizedName.slice(1),
+      version,
+    };
+  }));
+};
+
 /** @internal */
 export const extractPackages = (
   lockFile: string,
@@ -67,6 +82,7 @@ export const extractPackages = (
   jsr: Pkg[];
   npm: Pkg[];
   esm: Pkg[];
+  denoland: Pkg[];
 } => {
   const lock: {
     jsr: Record<string, unknown>;
@@ -76,20 +92,12 @@ export const extractPackages = (
 
   const jsrKeys = extractKeys(lock.jsr);
   const npmKeys = extractKeys(lock.npm);
-  const esmKeys = extractKeys(lock.remote);
-
-  if (!silent) {
-    console.info(`Found ${jsrKeys.length} JSR packages`);
-    if (verbose) console.info(formatKeys(jsrKeys));
-
-    console.info(`Found ${npmKeys.length} NPM packages`);
-    if (verbose) console.info(formatKeys(npmKeys));
-
-    console.info(`Found ${esmKeys.length} ESM packages`);
-    if (verbose) console.info(formatKeys(esmKeys));
-
-    console.info();
-  }
+  const esmKeys = extractKeys(lock.remote).filter((r) =>
+    r.includes("https://esm.sh")
+  );
+  const denolandKeys = extractKeys(lock.remote).filter((r) =>
+    r.includes("https://deno.land")
+  );
 
   const [jsr, jsrMissingVersions] = partition(
     normalizeJsrKeys(jsrKeys),
@@ -106,7 +114,26 @@ export const extractPackages = (
     ({ version }) => version !== undefined,
   );
 
+  const [denoland, denolandMissingVersions] = partition(
+    normalizeDenolandKeys(denolandKeys),
+    ({ version }) => version !== undefined,
+  );
+
   if (!silent) {
+    console.info(`Found ${jsr.length} JSR packages`);
+    if (verbose && jsr.length) console.info(formatKeys(jsr));
+
+    console.info(`Found ${npm.length} NPM packages`);
+    if (verbose && npm.length) console.info(formatKeys(npm));
+
+    console.info(`Found ${esm.length} ESM packages`);
+    if (verbose && esm.length) console.info(formatKeys(esm));
+
+    console.info(`Found ${denoland.length} deno.land packages`);
+    if (verbose && denoland.length) console.info(formatKeys(denoland));
+
+    console.info();
+
     if (jsrMissingVersions.length) {
       console.warn(
         `Missing version for JSR packages: ${
@@ -128,6 +155,13 @@ export const extractPackages = (
         }\n`,
       );
     }
+    if (denolandMissingVersions.length) {
+      console.warn(
+        `Missing version for deno.land packages: ${
+          denolandMissingVersions.map((p) => p.name).join(", ")
+        }\n`,
+      );
+    }
   }
 
   const toIgnore = [...File.readAuditIgnore(), ...(ignore || [])];
@@ -136,5 +170,6 @@ export const extractPackages = (
     jsr: jsr.filter(({ name }) => !toIgnore?.find((i) => i === name)),
     npm: npm.filter(({ name }) => !toIgnore?.find((i) => i === name)),
     esm: esm.filter(({ name }) => !toIgnore?.find((i) => i === name)),
+    denoland: denoland.filter(({ name }) => !toIgnore?.find((i) => i === name)),
   };
 };

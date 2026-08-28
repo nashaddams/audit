@@ -1,6 +1,6 @@
 {
   "name": "@nashaddams/audit",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "license": "MIT",
   "exports": "./mod.ts",
   "imports": {
@@ -16,10 +16,10 @@
     "@std/testing/snapshot": "jsr:@std/testing@1.0.8/snapshot"
   },
   "tasks": {
-    "build": "deno compile -RW=. -E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.jsr.io,api.github.com,0.0.0.0 --allow-run=\"npm\" -o dist/audit mod.ts",
-    "audit": "deno run -RW=. -E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.jsr.io,api.github.com --allow-run=\"npm\" mod.ts",
+    "build": "deno compile -RW=. -E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.jsr.io,cdn.deno.land,api.github.com,0.0.0.0 --allow-run=\"npm\" -o dist/audit mod.ts",
+    "audit": "deno run -RW=. -E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.jsr.io,cdn.deno.land,api.github.com --allow-run=\"npm\" mod.ts",
     "report": "deno run -R=. -E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=0.0.0.0 mod.ts report",
-    "test": "deno test -RW -E=GITHUB_TOKEN -N=api.jsr.io,api.github.com --coverage=cov",
+    "test": "deno test -RW -E=GITHUB_TOKEN -N=api.jsr.io,api.github.com,cdn.deno.land --coverage=cov",
     "coverage:lcov": "deno coverage --exclude=test --lcov cov > cov.lcov",
     "coverage:html": "deno coverage --html --exclude=test cov",
     "coverage:console": "deno coverage --exclude=test cov",
