@@ -81,12 +81,12 @@ passed instead:
 
 <summary>Details</summary>
 
-| Permission                                   | Usage                                                                |
-| -------------------------------------------- | -------------------------------------------------------------------- |
-| `-R=.`                                       | Read the lock file and the report.                                   |
-| `-W=.`                                       | Write the report.                                                    |
-| `-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`  | Used for authenticated GitHub API requests and the terminal spinner. |
-| `-N=api.jsr.io,cdn.deno.land,api.github.com` | Fetch the package informations, and GitHub security advisories.      |
-| `-N=0.0.0.0`                                 | Serve the generated audit report.                                    |
+| Permission                                                      | Usage                                                                |
+| --------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `-R=.`                                                          | Read the lock file and the report.                                   |
+| `-W=.`                                                          | Write the report.                                                    |
+| `-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`                     | Used for authenticated GitHub API requests and the terminal spinner. |
+| `-N=api.jsr.io,cdn.deno.land,registry.npmjs.org,api.github.com` | Fetch the package informations, and GitHub security advisories.      |
+| `-N=0.0.0.0`                                                    | Serve the generated audit report.                                    |
 
 </details>
