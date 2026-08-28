@@ -2,3 +2,5 @@
 .audit
 dist
 docs
+cov
+cov.lcov
