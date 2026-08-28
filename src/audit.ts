@@ -13,6 +13,7 @@ import { fetchLicenses } from "./license.ts";
 const DEFAULT_LOCK_FILE: string = `${Deno.cwd()}/deno.lock`;
 const DEFAULT_SEVERITY: Severity = "medium";
 const DEFAULT_RESOLVER: ResolverName = "deno-lock";
+const DEFAULT_RESOLVE_ONLY: boolean = false;
 
 /** Options for the {@link audit} function. */
 export type AuditOptions = {
@@ -22,6 +23,8 @@ export type AuditOptions = {
   severity?: Severity;
   /** Resolver to use: `deno-lock`, `package-lock`, `bun-lock` (default: `deno-lock`) */
   resolver?: ResolverName;
+  /** Only resolve lock file packages, don't audit them. */
+  resolveOnly?: boolean;
 };
 
 /**
@@ -35,6 +38,7 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
     lockFile = DEFAULT_LOCK_FILE,
     severity = DEFAULT_SEVERITY,
     resolver = DEFAULT_RESOLVER,
+    resolveOnly = DEFAULT_RESOLVE_ONLY,
   }: AuditOptions = options ?? {};
 
   File.clearOutputDir();
@@ -45,6 +49,11 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
   const resolvedWithAdvisories = resolved.filter((pkg) =>
     pkg.advisories?.length
   );
+
+  if (resolveOnly) {
+    return 0;
+  }
+
   const matched = match(resolvedWithAdvisories);
   const { ignore = {} } = File.readConfig();
 
@@ -142,8 +151,15 @@ export const runAudit = async (args: string[] = Deno.args): Promise<void> => {
         default: DEFAULT_RESOLVER,
       },
     )
-    .action(async ({ lockFile, severity, resolver }) => {
-      const code = await audit({ lockFile, severity, resolver });
+    .option(
+      "--resolve-only",
+      "Only resolve lock file packages, don't audit them.",
+      {
+        default: false,
+      },
+    )
+    .action(async ({ lockFile, severity, resolver, resolveOnly }) => {
+      const code = await audit({ lockFile, severity, resolver, resolveOnly });
       Deno.exit(code);
     })
     .example(
