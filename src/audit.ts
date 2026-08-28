@@ -137,7 +137,7 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
     )
     .option(
       "-l, --lock-file <lock-file:file>",
-      "Lock file to audit (Deno v4, NPM v3).",
+      "Lock file to audit (Deno v4, NPM v3, Bun v1).",
       {
         default: DEFAULT_LOCK_FILE,
       },
