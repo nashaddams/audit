@@ -11,6 +11,7 @@ import { npmAuditEsmOnly } from "./mock/npm-audit-esm-only.ts";
 
 describe("audit", () => {
   let fetchAdvisoriesStub: Stub | undefined = undefined;
+  let npmInstallStub: Stub | undefined = undefined;
   let npmAuditStub: Stub | undefined = undefined;
 
   beforeEach(() => {
@@ -19,10 +20,16 @@ describe("audit", () => {
       "fetchAdvisories",
       async () => await Promise.resolve(githubAdvisories),
     );
+    npmInstallStub = stub(
+      Cmd,
+      "npmInstall",
+      () => ({ stderr: "" }),
+    );
   });
 
   afterEach(() => {
     fetchAdvisoriesStub?.restore();
+    npmInstallStub?.restore();
     npmAuditStub?.restore();
   });
 
