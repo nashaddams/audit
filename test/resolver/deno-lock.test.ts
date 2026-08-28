@@ -1,8 +1,8 @@
 import { assertEquals } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
-import { extractPackages } from "../src/extract.ts";
+import DenoLockResolver from "../../src/resolver/deno-lock.ts";
 
-describe("extract", () => {
+describe("[resolver][deno_lock}", () => {
   let tmpLockFile: string | undefined = undefined;
 
   beforeEach(() => {
@@ -26,13 +26,13 @@ describe("extract", () => {
       }),
     );
 
-    const { esm } = extractPackages(tmpLockFile!, {
-      silent: true,
-      verbose: false,
-    });
+    const extracted = DenoLockResolver.extract(tmpLockFile!);
+    const resolved = DenoLockResolver.origins.esm.normalize(extracted.esm);
 
-    assertEquals(esm, [
+    assertEquals(resolved, [
       { name: "echarts", version: "5.5.1" },
+      { name: "echarts", version: "5.5.1" },
+      { name: "react", version: "18.3.1" },
       { name: "react", version: "18.3.1" },
     ]);
   });
@@ -48,12 +48,10 @@ describe("extract", () => {
       }),
     );
 
-    const { esm } = extractPackages(tmpLockFile!, {
-      silent: true,
-      verbose: false,
-    });
+    const extracted = DenoLockResolver.extract(tmpLockFile!);
+    const resolved = DenoLockResolver.origins.esm.normalize(extracted.esm);
 
-    assertEquals(esm, [
+    assertEquals(resolved, [
       { name: "@emotion/is-prop-valid", version: "1.2.2" },
     ]);
   });
@@ -69,35 +67,10 @@ describe("extract", () => {
       }),
     );
 
-    const { esm } = extractPackages(tmpLockFile!, {
-      silent: true,
-      verbose: false,
-    });
+    const extracted = DenoLockResolver.extract(tmpLockFile!);
+    const resolved = DenoLockResolver.origins.esm.normalize(extracted.esm);
 
-    assertEquals(esm, []);
-  });
-
-  it("should ignore explicitly ignored packages", () => {
-    Deno.writeTextFileSync(
-      tmpLockFile!,
-      JSON.stringify({
-        remote: {
-          "https://esm.sh/echarts@5.5.1": "",
-          "https://esm.sh/handlebars@4.5.3": "",
-          "https://esm.sh/react@18.3.1": "",
-        },
-      }),
-    );
-
-    const { esm } = extractPackages(tmpLockFile!, {
-      ignore: ["react", "handlebars"],
-      silent: true,
-      verbose: false,
-    });
-
-    assertEquals(esm, [
-      { name: "echarts", version: "5.5.1" },
-    ]);
+    assertEquals(resolved, []);
   });
 
   it("should extract deno.land packages", () => {
@@ -112,12 +85,13 @@ describe("extract", () => {
       }),
     );
 
-    const { denoland } = extractPackages(tmpLockFile!, {
-      silent: true,
-      verbose: false,
-    });
+    const extracted = DenoLockResolver.extract(tmpLockFile!);
+    const resolved = DenoLockResolver.origins.denoland.normalize(
+      extracted.denoland,
+    );
 
-    assertEquals(denoland, [
+    assertEquals(resolved, [
+      { name: "std", version: "0.214.0" },
       { name: "std", version: "0.214.0" },
       { name: "postgresjs", version: "v3.4.5" },
     ]);
@@ -138,12 +112,10 @@ describe("extract", () => {
       }),
     );
 
-    const { npm } = extractPackages(tmpLockFile!, {
-      silent: true,
-      verbose: false,
-    });
+    const extracted = DenoLockResolver.extract(tmpLockFile!);
+    const resolved = DenoLockResolver.origins.npm.normalize(extracted.npm);
 
-    assertEquals(npm, [
+    assertEquals(resolved, [
       { name: "@algolia/autocomplete-core", version: "1.17.7" },
       { name: "algoliasearch", version: "5.18.0" },
       {
@@ -151,8 +123,10 @@ describe("extract", () => {
         version: "1.17.7",
       },
       { name: "search-insights", version: "2.17.3" },
+      { name: "algoliasearch", version: "5.18.0" },
       { name: "@algolia/autocomplete-preset-algolia", version: "1.17.7" },
       { name: "@algolia/client-search", version: "5.18.0" },
+      { name: "algoliasearch", version: "5.18.0" },
       { name: "@vitejs/plugin-vue", version: "5.2.1" },
       { name: "vite", version: "5.4.11" },
       { name: "vue", version: "3.5.13" },

@@ -7,21 +7,17 @@
 A tool for auditing [JSR](https://jsr.io), [deno.land](https://deno.land/x),
 [NPM](https://www.npmjs.com), and [ESM](https://esm.sh) packages with
 [Deno](https://deno.com) utilizing the
-[GitHub Advisory Database](https://github.com/advisories) and
-[`npm audit`](https://docs.npmjs.com/cli/commands/npm-audit).
+[GitHub Advisory Database](https://github.com/advisories).
 
-The packages are extracted from a given `deno.lock` (v4) file.
+## Workflow
 
-## JSR & deno.land packages
-
-For JSR and deno.land packages, `audit` tries to infer the corresponding GitHub
-repository (_api.jsr.io_ & _cdn.deno.land_) from where it can gather published
-vulnerabilities (_api.github.io_).
-
-## NPM & ESM packages
-
-NPM and ESM packages are injected into a generated `package.json` file on which
-`npm audit` is executed.
+- Extract the packages from a given `deno.lock` (v4) file
+- Resolve the corresponding GitHub repositories
+  - JSR via `api.jsr.io`
+  - deno.land via `cdn.deno.land`
+  - NPM & ESM via `registry.npmjs.org`
+- Fetch published vulnerabilities via `api.github.io`
+- Create a report
 
 ## Usage
 
@@ -56,11 +52,18 @@ The `report` subcommand serves the generated audit report:
 deno run -A jsr:@nashaddams/audit report
 ```
 
-### Ignoring packages
+### Ignoring vulnerabilities
 
-Packages can be excluded from the audit by passing the package names to the
-`-i, --ignore` flag (comma separated list), or by adding them to an
-`.auditignore` file (one package name per row).
+Vulnerabilities for a specific package can be excluded by adding the package
+name and CVE ID(s) to an `audit.json` file:
+
+```json
+{
+  "ignore": {
+    "@std/bytes": ["CVE-2024-52793"]
+  }
+}
+```
 
 ### Granular `run` permissions
 
@@ -68,23 +71,22 @@ For convenience, the previous `run` instructions use the `-A` permission flag
 which grants all permissions to `audit`. Alternatively, granular flags can be
 passed instead:
 
-| Command        | Permissions                                                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `audit`        | `-RW=.`<br/>`-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=api.jsr.io,cdn.deno.land,api.github.com`<br/>`--allow-run=npm` |
-| `audit report` | `-R=.`<br/>`-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=0.0.0.0`                                                        |
-| `audit --help` | `-R=.`<br/>`-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`                                                                         |
+| Command        | Permissions                                                                                                                 |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `audit`        | `-RW=.`<br/>`-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=api.jsr.io,cdn.deno.land,registry.npmjs.org,api.github.com` |
+| `audit report` | `-R=.`<br/>`-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`<br/>`-N=0.0.0.0`                                                     |
+| `audit --help` | `-R=.`<br/>`-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`                                                                      |
 
 <details>
 
 <summary>Details</summary>
 
-| Permission                                   | Usage                                                                            |
-| -------------------------------------------- | -------------------------------------------------------------------------------- |
-| `-R=.`                                       | Read the lock file and the report.                                               |
-| `-W=.`                                       | Write the `package.json` and the report.                                         |
-| `-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`  | Used for authenticated GitHub API requests and the `npm audit` subcommand.       |
-| `-N=api.jsr.io,cdn.deno.land,api.github.com` | Fetch the JSR and deno.land package information, and GitHub security advisories. |
-| `-N=0.0.0.0`                                 | Serve the generated audit report.                                                |
-| `--allow-run=npm`                            | Run `npm install` and `npm audit`.                                               |
+| Permission                                   | Usage                                                                |
+| -------------------------------------------- | -------------------------------------------------------------------- |
+| `-R=.`                                       | Read the lock file and the report.                                   |
+| `-W=.`                                       | Write the report.                                                    |
+| `-E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM`  | Used for authenticated GitHub API requests and the terminal spinner. |
+| `-N=api.jsr.io,cdn.deno.land,api.github.com` | Fetch the package informations, and GitHub security advisories.      |
+| `-N=0.0.0.0`                                 | Serve the generated audit report.                                    |
 
 </details>

@@ -1,9 +1,23 @@
 import { CSS, render } from "@deno/gfm";
+import { join } from "@std/path";
+
+/** @internal */
+export type Config = {
+  ignore?: {
+    [key: string]: string[];
+  };
+};
 
 /** @internal */
 export const File = {
-  writePackageJson: (outputDir: string, data: string): void => {
-    Deno.writeTextFileSync(`${outputDir}/package.json`, data);
+  readConfig: (): Config => {
+    try {
+      return JSON.parse(
+        Deno.readTextFileSync(join(Deno.cwd(), "audit.json")),
+      ) as Config;
+    } catch {
+      return {};
+    }
   },
   writeReport: (outputDir: string, data: string): void => {
     Deno.writeTextFileSync(`${outputDir}/report.md`, data, { append: true });
@@ -39,15 +53,6 @@ export const File = {
     } catch (err) {
       if (!(err instanceof Deno.errors.NotFound)) throw err;
       console.info(`No audit report found at ${outputDir}/report.md`);
-    }
-  },
-  readAuditIgnore: (): string[] => {
-    try {
-      const auditIgnoreText = Deno.readTextFileSync(".auditignore").trim();
-      return auditIgnoreText ? auditIgnoreText.split("\n") : [];
-    } catch (err) {
-      if (!(err instanceof Deno.errors.NotFound)) throw err;
-      return [];
     }
   },
 };

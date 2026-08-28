@@ -1,4 +1,28 @@
-import type { DenolandPkg, GithubAdvisories, JsrPkg } from "./types.ts";
+import type { GithubAdvisories } from "./types.ts";
+
+// See https://github.com/jsr-io/jsr/blob/main/frontend/utils/api.ts
+type JsrPkg = {
+  githubRepository: {
+    owner: string;
+    name: string;
+  } | null;
+};
+
+// All modules on deno.land/x need to be hosted as public repositories on GitHub.com
+type DenolandPkg = {
+  upload_options: {
+    type: string;
+    repository: string;
+    ref: string;
+  };
+};
+
+// See https://github.com/npm/registry/blob/main/docs/REGISTRY-API.md
+type NpmPkg = {
+  repository?: {
+    url?: string;
+  };
+};
 
 type Api = {
   fetchJsrPkg: (
@@ -7,8 +31,11 @@ type Api = {
   fetchDenolandPkg: (
     options: { pkg: string; version: string },
   ) => Promise<DenolandPkg | null>;
+  fetchNpmPkg: (
+    options: { pkg: string },
+  ) => Promise<NpmPkg | null>;
   fetchGithubAdvisories: (
-    options: { owner: string; repo: string; githubToken?: string },
+    options: { owner: string; repo: string },
   ) => Promise<GithubAdvisories | null>;
 };
 
@@ -54,7 +81,28 @@ export const Api: Api = {
       return null;
     }
   },
-  fetchGithubAdvisories: async ({ owner, repo, githubToken }) => {
+  fetchNpmPkg: async ({ pkg }) => {
+    // `https://www.npmjs.com/package/${pkg}/v/${version}/provenance`,
+    const res = await fetch(
+      `https://registry.npmjs.org/${pkg}`,
+    );
+
+    try {
+      const json = await res.json() as NpmPkg;
+
+      if (!res.ok) {
+        throw new Error(JSON.stringify(json, null, 2));
+      }
+
+      return json;
+    } catch (err) {
+      console.warn(`Unable to fetch NPM package ${pkg}`, err);
+      return null;
+    }
+  },
+  fetchGithubAdvisories: async ({ owner, repo }) => {
+    const githubToken: string | undefined = Deno.env.get("GITHUB_TOKEN");
+
     const res = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/security-advisories`,
       {

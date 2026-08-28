@@ -3,9 +3,7 @@ export const snapshot = {};
 snapshot[`All 1`] = `
 "# Audit report
 
-## JSR
-
-### @hono/hono (4.6.14)
+## @hono/hono 4.6.14 \`jsr\`
 
 \`\`\`
 Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
@@ -30,7 +28,7 @@ Affected versions: <= 1.0.10
 Patched versions: 1.0.11
 \`\`\`
 
-### @logtape/logtape (0.8.0)
+## std 0.214.0 \`denoland\`
 
 \`\`\`
 Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
@@ -55,7 +53,7 @@ Affected versions: <= 1.0.10
 Patched versions: 1.0.11
 \`\`\`
 
-### @nashaddams/amqp (1.0.0)
+## @algolia/autocomplete-core 1.17.7 \`npm\`
 
 \`\`\`
 Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
@@ -78,278 +76,6 @@ GHSA: GHSA-32fx-h446-h8pf
 Affected package: @std/http (other)
 Affected versions: <= 1.0.10
 Patched versions: 1.0.11
-\`\`\`
-
-### @std/bytes (1.0.4)
-
-\`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-GHSA: GHSA-32fx-h446-h8pf
-
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
-\`\`\`
-\`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-GHSA: GHSA-32fx-h446-h8pf
-
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
-\`\`\`
-
-### @std/io (0.225.0)
-
-\`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-GHSA: GHSA-32fx-h446-h8pf
-
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
-\`\`\`
-\`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-GHSA: GHSA-32fx-h446-h8pf
-
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
-\`\`\`
-
-## deno.land
-
-### std (0.214.0)
-
-\`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-GHSA: GHSA-32fx-h446-h8pf
-
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
-\`\`\`
-\`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-GHSA: GHSA-32fx-h446-h8pf
-
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
-\`\`\`
-
-### postgres (v0.19.3)
-
-\`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-GHSA: GHSA-32fx-h446-h8pf
-
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
-\`\`\`
-\`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-GHSA: GHSA-32fx-h446-h8pf
-
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
-\`\`\`
-
-## NPM/ESM
-
-### axios
-
-Severity: high | Affected versions: 1.3.2 - 1.7.3 | Patched versions: 1.7.9
-
-\`\`\`
-Title: Server-Side Request Forgery in axios
-Severity: high
-Details: https://github.com/advisories/GHSA-8hc4-vh64-cxmj
-
-Affected package: axios
-Affected versions: >=1.3.2 <=1.7.3
-Patched versions: 1.7.9
-\`\`\`
-
-### body-parser
-
-Severity: high | Affected versions: <1.20.3 | Patched versions: 4.21.2
-
-\`\`\`
-Title: body-parser vulnerable to denial of service when url encoding is enabled
-Severity: high
-Details: https://github.com/advisories/GHSA-qwcr-r2fm-qrc7
-
-Affected package: body-parser
-Affected versions: <1.20.3
-Patched versions: 4.21.2
-\`\`\`
-
-### cookie
-
-Severity: low | Affected versions: <0.7.0 | Patched versions: 1.0.2
-
-\`\`\`
-Title: cookie accepts cookie name, path, and domain with out of bounds characters
-Severity: low
-Details: https://github.com/advisories/GHSA-pxg6-pf52-xh8x
-
-Affected package: cookie
-Affected versions: <0.7.0
-Patched versions: 1.0.2
-\`\`\`
-
-### express
-
-Severity: high | Affected versions: <=4.21.1 || 5.0.0-alpha.1 - 5.0.0 | Patched versions: 4.21.2
-
-\`\`\`
-Title: Express.js Open Redirect in malformed URLs
-Severity: moderate
-Details: https://github.com/advisories/GHSA-rv95-896h-c2vc
-
-Affected package: express
-Affected versions: <4.19.2
-Patched versions: 4.21.2
-\`\`\`
-\`\`\`
-Title: express vulnerable to XSS via response.redirect()
-Severity: low
-Details: https://github.com/advisories/GHSA-qw6h-vgh9-j6wx
-
-Affected package: express
-Affected versions: <4.20.0
-Patched versions: 4.21.2
-\`\`\`
-
-### handlebars
-
-Severity: critical | Affected versions: <=4.7.6 | Patched versions: 4.7.8
-
-\`\`\`
-Title: Remote code execution in handlebars when compiling templates
-Severity: critical
-Details: https://github.com/advisories/GHSA-f2jv-r9rf-7988
-
-Affected package: handlebars
-Affected versions: <4.7.7
-Patched versions: 4.7.8
-\`\`\`
-\`\`\`
-Title: Prototype Pollution in handlebars
-Severity: critical
-Details: https://github.com/advisories/GHSA-765h-qjxv-5f44
-
-Affected package: handlebars
-Affected versions: <4.7.7
-Patched versions: 4.7.8
-\`\`\`
-
-### minimist
-
-Severity: critical | Affected versions: <=0.2.3 | Patched versions: 4.7.8
-
-\`\`\`
-Title: Prototype Pollution in minimist
-Severity: moderate
-Details: https://github.com/advisories/GHSA-vh95-rmgr-6w4m
-
-Affected package: minimist
-Affected versions: <0.2.1
-Patched versions: 4.7.8
-\`\`\`
-\`\`\`
-Title: Prototype Pollution in minimist
-Severity: critical
-Details: https://github.com/advisories/GHSA-xvch-5gv4-984h
-
-Affected package: minimist
-Affected versions: <0.2.4
-Patched versions: 4.7.8
-\`\`\`
-
-### optimist
-
-Severity: critical | Affected versions: >=0.6.0 | Patched versions: 4.7.8
-
-
-
-### path-to-regexp
-
-Severity: high | Affected versions: <=0.1.11 | Patched versions: 4.21.2
-
-\`\`\`
-Title: path-to-regexp outputs backtracking regular expressions
-Severity: high
-Details: https://github.com/advisories/GHSA-9wv6-86v2-598j
-
-Affected package: path-to-regexp
-Affected versions: <0.1.10
-Patched versions: 4.21.2
-\`\`\`
-\`\`\`
-Title: Unpatched \`path-to-regexp\` ReDoS in 0.1.x
-Severity: moderate
-Details: https://github.com/advisories/GHSA-rhx6-c78j-4q9w
-
-Affected package: path-to-regexp
-Affected versions: <0.1.12
-Patched versions: 4.21.2
-\`\`\`
-
-### send
-
-Severity: low | Affected versions: <0.19.0 | Patched versions: 1.1.0
-
-\`\`\`
-Title: send vulnerable to template injection that can lead to XSS
-Severity: low
-Details: https://github.com/advisories/GHSA-m6fv-jmcg-4jfg
-
-Affected package: send
-Affected versions: <0.19.0
-Patched versions: 1.1.0
-\`\`\`
-
-### serve-static
-
-Severity: low | Affected versions: <=1.16.0 | Patched versions: 4.21.2
-
-\`\`\`
-Title: serve-static vulnerable to template injection that can lead to XSS
-Severity: low
-Details: https://github.com/advisories/GHSA-cm22-4g7w-348p
-
-Affected package: serve-static
-Affected versions: <1.16.0
-Patched versions: 4.21.2
 \`\`\`
 "
 `;

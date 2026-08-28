@@ -3,34 +3,52 @@ import { type Stub, stub } from "@std/testing/mock";
 import { assertSnapshot } from "@std/testing/snapshot";
 import { audit } from "../mod.ts";
 import { Api } from "../src/api.ts";
-import { Cmd } from "../src/cmd.ts";
-import { jsrPkg } from "./mock/jsr-package.ts";
 import { githubAdvisories } from "./mock/github-advisories.ts";
-import { npmAuditAll } from "./mock/npm-audit-all.ts";
-import { npmAuditNpmOnly } from "./mock/npm-audit-npm-only.ts";
-import { npmAuditEsmOnly } from "./mock/npm-audit-esm-only.ts";
 
 describe("audit", () => {
   let fetchJsrPkgStub: Stub | undefined = undefined;
+  let fetchDenolandPkgStub: Stub | undefined = undefined;
+  let fetchNpmPkgStub: Stub | undefined = undefined;
   let fetchGithubAdvisoriesStub: Stub | undefined = undefined;
-  let npmInstallStub: Stub | undefined = undefined;
-  let npmAuditStub: Stub | undefined = undefined;
 
   beforeEach(() => {
     fetchJsrPkgStub = stub(
       Api,
       "fetchJsrPkg",
-      async () => await Promise.resolve(jsrPkg),
+      async () =>
+        await Promise.resolve({
+          githubRepository: {
+            owner: "nashaddams",
+            name: "audit",
+          },
+        }),
+    );
+    fetchDenolandPkgStub = stub(
+      Api,
+      "fetchDenolandPkg",
+      async () =>
+        await Promise.resolve({
+          upload_options: {
+            type: "github",
+            repository: "denoland/deno_std",
+            ref: "0.214.0",
+          },
+        }),
+    );
+    fetchNpmPkgStub = stub(
+      Api,
+      "fetchNpmPkg",
+      async () =>
+        await Promise.resolve({
+          repository: {
+            url: "git+https://github.com/axios/axios.git",
+          },
+        }),
     );
     fetchGithubAdvisoriesStub = stub(
       Api,
       "fetchGithubAdvisories",
       async () => await Promise.resolve(githubAdvisories),
-    );
-    npmInstallStub = stub(
-      Cmd,
-      "npmInstall",
-      () => ({ stderr: "" }),
     );
   });
 
@@ -38,14 +56,14 @@ describe("audit", () => {
     if (fetchJsrPkgStub && !fetchJsrPkgStub.restored) {
       fetchJsrPkgStub.restore();
     }
+    if (fetchDenolandPkgStub && !fetchDenolandPkgStub.restored) {
+      fetchDenolandPkgStub.restore();
+    }
+    if (fetchNpmPkgStub && !fetchNpmPkgStub.restored) {
+      fetchNpmPkgStub.restore();
+    }
     if (fetchGithubAdvisoriesStub && !fetchGithubAdvisoriesStub.restored) {
       fetchGithubAdvisoriesStub.restore();
-    }
-    if (npmInstallStub && !npmInstallStub.restored) {
-      npmInstallStub.restore();
-    }
-    if (npmAuditStub && !npmAuditStub.restored) {
-      npmAuditStub.restore();
     }
     Deno.removeSync(".audit", { recursive: true });
   });
@@ -54,7 +72,6 @@ describe("audit", () => {
     await audit({
       lock: "test/examples/jsr-only/deno.lock",
       severity: "low",
-      silent: true,
     });
 
     await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {
@@ -64,16 +81,9 @@ describe("audit", () => {
   });
 
   it("should audit NPM packages", async (t) => {
-    npmAuditStub = stub(
-      Cmd,
-      "npmAudit",
-      () => ({ code: 1, stdout: JSON.stringify(npmAuditNpmOnly), stderr: "" }),
-    );
-
     await audit({
       lock: "test/examples/npm-only/deno.lock",
       severity: "low",
-      silent: true,
     });
 
     await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {
@@ -83,16 +93,9 @@ describe("audit", () => {
   });
 
   it("should audit ESM packages", async (t) => {
-    npmAuditStub = stub(
-      Cmd,
-      "npmAudit",
-      () => ({ code: 1, stdout: JSON.stringify(npmAuditEsmOnly), stderr: "" }),
-    );
-
     await audit({
       lock: "test/examples/esm-only/deno.lock",
       severity: "low",
-      silent: true,
     });
 
     await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {
@@ -102,16 +105,9 @@ describe("audit", () => {
   });
 
   it("should audit all packages", async (t) => {
-    npmAuditStub = stub(
-      Cmd,
-      "npmAudit",
-      () => ({ code: 1, stdout: JSON.stringify(npmAuditAll), stderr: "" }),
-    );
-
     await audit({
       lock: "test/examples/all/deno.lock",
       severity: "low",
-      silent: true,
     });
 
     await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {
