@@ -1,10 +1,10 @@
 import {
-  greaterThan,
-  greaterThanRange,
+  equals,
   isRange,
   isSemVer,
   parse,
   type Range,
+  satisfies,
   type SemVer,
   tryParse,
   tryParseRange,
@@ -27,8 +27,8 @@ export const match = (pkgs: PkgResolved[]): PkgResolved[] => {
         )
         .filter((vv): vv is string => typeof vv === "string")
         .map((vulnVersion) => {
-          let version: SemVer | Range | undefined =
-            tryParseRange(vulnVersion) ?? tryParse(vulnVersion);
+          let version: SemVer | Range | undefined = tryParse(vulnVersion) ??
+            tryParseRange(vulnVersion);
 
           if (!version) {
             version = tryParseRange(vulnVersion.replaceAll(",", " "));
@@ -48,20 +48,18 @@ export const match = (pkgs: PkgResolved[]): PkgResolved[] => {
         })
         .filter((vv): vv is SemVer | Range => isSemVer(vv) || isRange(vv));
 
-      let isVulnerable = true;
+      const isVulnerable: boolean[] = [];
 
       for (const vv of vulnerabilityVersions) {
         if (
-          (isRange(vv) && greaterThanRange(pkgVersion, vv)) ||
-          (isSemVer(vv) && greaterThan(pkgVersion, vv))
+          (isSemVer(vv) && equals(pkgVersion, vv)) ||
+          (isRange(vv) && satisfies(pkgVersion, vv))
         ) {
-          isVulnerable = false;
-        } else {
-          isVulnerable = true;
+          isVulnerable.push(true);
         }
       }
 
-      return isVulnerable;
+      return isVulnerable.includes(true);
     });
   }
 
