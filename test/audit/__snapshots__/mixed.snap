@@ -1,0 +1,99 @@
+export const snapshot = {};
+
+snapshot[`mixed 1`] = `
+"# Audit report
+
+## @hono/hono 4.6.4 \`jsr\`
+
+\`\`\`
+Title: Bypass CSRF Middleware by a request without Content-Type header
+Severity: medium
+Published: 2024-10-15
+Details: https://github.com
+CVE: CVE-2024-48913
+CWE: CWE-352: Cross-Site Request Forgery (CSRF)
+GHSA: GHSA-2234-fmw7-43wr
+
+Affected package: hono (other)
+Affected versions: 4.6.4
+Patched versions: N/A
+\`\`\`
+\`\`\`
+Title: Bypass CSRF Middleware by a request without Content-Type header
+Severity: medium
+Published: 2024-10-15
+Details: https://github.com
+CVE: CVE-2024-48913
+CWE: CWE-352: Cross-Site Request Forgery (CSRF)
+GHSA: GHSA-2234-fmw7-43wr
+
+Affected package: http (other)
+Affected versions: 10.0.4
+Patched versions: N/A
+\`\`\`
+
+## @nashaddams/amqp 1.0.0 \`jsr\`
+
+\`\`\`
+Title: Bypass CSRF Middleware by a request without Content-Type header
+Severity: medium
+Published: 2024-10-15
+Details: https://github.com
+CVE: CVE-2024-48913
+CWE: CWE-352: Cross-Site Request Forgery (CSRF)
+GHSA: GHSA-2234-fmw7-43wr
+
+Affected package: amqp (other)
+Affected versions: 1.0.0
+Patched versions: N/A
+\`\`\`
+
+## postgres v0.19.3 \`denoland\`
+
+\`\`\`
+Title: Bypass CSRF Middleware by a request without Content-Type header
+Severity: medium
+Published: 2024-10-15
+Details: https://github.com
+CVE: CVE-2024-48913
+CWE: CWE-352: Cross-Site Request Forgery (CSRF)
+GHSA: GHSA-2234-fmw7-43wr
+
+Affected package: postgres (other)
+Affected versions: 0.19.3
+Patched versions: N/A
+\`\`\`
+
+## axios 1.7.1 \`npm\`
+
+\`\`\`
+Title: Bypass CSRF Middleware by a request without Content-Type header
+Severity: medium
+Published: 2024-10-15
+Details: https://github.com
+CVE: CVE-2024-48913
+CWE: CWE-352: Cross-Site Request Forgery (CSRF)
+GHSA: GHSA-2234-fmw7-43wr
+
+Affected package: axios (npm)
+Affected versions: 1.7.1
+Patched versions: N/A
+\`\`\`
+
+## echarts 5.5.1 \`esm\`
+
+\`\`\`
+Title: Bypass CSRF Middleware by a request without Content-Type header
+Severity: medium
+Published: 2024-10-15
+Details: https://github.com
+CVE: CVE-2024-48913
+CWE: CWE-352: Cross-Site Request Forgery (CSRF)
+GHSA: GHSA-2234-fmw7-43wr
+
+Affected package: echarts (npm)
+Affected versions: 5.5.1
+Patched versions: N/A
+\`\`\`
+"
+`;
