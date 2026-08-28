@@ -1,0 +1,37 @@
+{
+  "version": "4",
+  "specifiers": {
+    "jsr:@logtape/logtape@0.8.0": "0.8.0",
+    "jsr:@nashaddams/amqp@1.0.0": "1.0.0",
+    "jsr:@std/bytes@^1.0.2": "1.0.4",
+    "jsr:@std/io@0.225.0": "0.225.0"
+  },
+  "jsr": {
+    "@logtape/logtape@0.8.0": {
+      "integrity": "12bdf406a713f754d99c2ff65deb45127ce4e2c59e7136d608042250629428bd"
+    },
+    "@nashaddams/amqp@1.0.0": {
+      "integrity": "7d75b8340ae54092c7a68ced65a701de6c1f516b7de23f5cb8e542d30da43207",
+      "dependencies": [
+        "jsr:@std/io"
+      ]
+    },
+    "@std/bytes@1.0.4": {
+      "integrity": "11a0debe522707c95c7b7ef89b478c13fb1583a7cfb9a85674cd2cc2e3a28abc"
+    },
+    "@std/io@0.225.0": {
+      "integrity": "c1db7c5e5a231629b32d64b9a53139445b2ca640d828c26bf23e1c55f8c079b3",
+      "dependencies": [
+        "jsr:@std/bytes"
+      ]
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@hono/hono@4.6.14",
+      "jsr:@logtape/logtape@0.8.0",
+      "jsr:@luca/esbuild-deno-loader@0.11.1",
+      "jsr:@nashaddams/amqp@1.0.0"
+    ]
+  }
+}
