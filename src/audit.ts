@@ -48,7 +48,11 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
   File.writeReport(outputDir, "# Audit report\n\n");
 
   const resolved = await resolve(lock);
-  const matched = match(resolved);
+  File.writePackages(outputDir, resolved);
+  const resolvedWithAdvisories = resolved.filter((pkg) =>
+    pkg.advisories?.length
+  );
+  const matched = match(resolvedWithAdvisories);
   const { ignore = {} } = File.readConfig();
 
   const pkgs = Object.keys(ignore).length > 0
@@ -97,7 +101,7 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
   await new Command()
     .name("audit")
     .description(
-      "A tool for auditing JSR, NPM, and ESM packages utilizing the GitHub Advisory Database and npm audit.",
+      "A tool for auditing JSR, deno.land, NPM, and ESM packages utilizing the GitHub Advisory Database.",
     )
     .version(denoJson.version)
     .type("severity", new EnumType(severities))

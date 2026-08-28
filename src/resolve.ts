@@ -64,7 +64,5 @@ export const resolve = async (path: string): Promise<PkgResolved[]> => {
 
   spinner.stop();
 
-  return Array.from(groupedByRepo.values()).flat().filter((pkg) =>
-    pkg.advisories?.length
-  );
+  return Array.from(groupedByRepo.values()).flat();
 };
