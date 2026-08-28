@@ -10,7 +10,9 @@ export const Api = {
     );
 
     try {
-      return await res.json() as JsrPackage;
+      const json = await res.json() as JsrPackage;
+      if (!res.ok) throw new Error(JSON.stringify(json, null, 2));
+      return json;
     } catch (err) {
       console.warn(
         `Unable to fetch JSR package @${jsrScope}/${jsrPackage}`,
@@ -45,7 +47,9 @@ export const Api = {
     );
 
     try {
-      return await res.json() as GitHubAdvisories;
+      const json = await res.json() as GitHubAdvisories;
+      if (!res.ok) throw new Error(JSON.stringify(json, null, 2));
+      return json;
     } catch (err) {
       console.warn(
         `Unable to fetch advisories from ${owner}/${name}`,
