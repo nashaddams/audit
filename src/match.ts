@@ -13,8 +13,17 @@ import type { PkgResolved } from "./types.ts";
 import { File } from "./file.ts";
 
 const sanitizeVersionRange = (versionRange: string): string => {
-  return versionRange
-    .replaceAll(",", " || ")
+  /**
+   * Versions like these: "<7.26.10, 8.0.1 - 8.0.2" are split at the ","
+   * and concatenated with an OR, others are concatenated with a space
+   * which results in an AND within the semver ranges.
+   */
+  const svr = versionRange.includes("-")
+    ? versionRange.replaceAll(",", " || ")
+    : versionRange.replaceAll(",", " ");
+
+  // Semicolons are interpreted as an OR
+  return svr
     .replaceAll(";", " || ")
     .replaceAll("=<", "<=")
     .replaceAll("=>", ">=");
