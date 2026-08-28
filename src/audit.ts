@@ -8,7 +8,11 @@ import type { PkgResolved } from "./types.ts";
 import { Env } from "./env.ts";
 import { File } from "./file.ts";
 import { Report } from "./report.ts";
-import { resolve } from "./resolve.ts";
+import {
+  resolveAdvisories,
+  resolveLicenses,
+  resolvePackages,
+} from "./resolve.ts";
 import { match } from "./match.ts";
 import { fetchLicenseTexts } from "./license.ts";
 
@@ -46,15 +50,16 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
   File.clearOutputDir();
   File.createOutputDir();
 
-  const resolved = await resolve(lockFile, resolver);
-  File.writeResolvedPackages(resolved);
-  const resolvedWithAdvisories = resolved.filter((pkg) =>
-    pkg.advisories?.length
-  );
+  const resolved = await resolvePackages(lockFile, resolver);
+  const resolvedWithLicenses = await resolveLicenses(resolved);
+  File.writeResolvedPackages(resolvedWithLicenses);
 
   if (resolveOnly) {
     return 0;
   }
+
+  const resolvedWithAdvisories = (await resolveAdvisories(resolvedWithLicenses))
+    .filter((pkg) => pkg.advisories?.length);
 
   const matched = match(resolvedWithAdvisories);
   const { ignore = {} } = File.readConfig();
@@ -186,11 +191,11 @@ export const runAudit = async (args: string[] = Deno.args): Promise<void> => {
         Deno.serve(
           {
             port: 4711,
-            onListen: (({ port, hostname }) => {
+            onListen: ({ port, hostname }) => {
               console.info(
                 `Serving audit report at http://${hostname}:${port}`,
               );
-            }),
+            },
           },
           () => new Response(htmlReport),
         );
