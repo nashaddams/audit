@@ -35,6 +35,12 @@ Running this command will print the audit results to the console, create a
 report in the output directory, and return an exit code indicating if
 vulnerabilities have been found (`1`) or not (`0`).
 
+### Ignoring packages
+
+Packages can be exculded from the audit by passing the package names to the
+`-i, --ignore` flag (comma separated list), or by adding them to an
+`.auditignore` file (one package name per row).
+
 ### HTML report
 
 ```sh

@@ -1,4 +1,6 @@
+import { partition } from "@std/collections/partition";
 import type { Package } from "./types.ts";
+import { File } from "./file.ts";
 
 const deduplicate = (a: Package[]): Package[] => {
   return a.filter((o, index, arr) =>
@@ -56,7 +58,11 @@ const normalizeEsmKeys = (keys: string[]): Package[] => {
 /** @internal */
 export const extractPackages = (
   lockFile: string,
-  { verbose, silent }: { verbose?: boolean; silent?: boolean },
+  { ignore, verbose, silent }: {
+    ignore?: string[] | readonly [];
+    verbose?: boolean;
+    silent?: boolean;
+  },
 ): {
   jsr: Package[];
   npm: Package[];
@@ -85,44 +91,50 @@ export const extractPackages = (
     console.info();
   }
 
-  const jsrPackages = Object.groupBy(
+  const [jsr, jsrMissingVersions] = partition(
     normalizeJsrKeys(jsrKeys),
-    ({ version }) => version === undefined ? "missingVersion" : "valid",
-  );
-  const npmPackages = Object.groupBy(
-    normalizeNpmKeys(npmKeys),
-    ({ version }) => version === undefined ? "missingVersion" : "valid",
-  );
-  const esmPackages = Object.groupBy(
-    normalizeEsmKeys(esmKeys),
-    ({ version }) => version === undefined ? "missingVersion" : "valid",
+    ({ version }) => version !== undefined,
   );
 
-  if (jsrPackages.missingVersion) {
-    console.warn(
-      `Missing version for JSR packages: ${
-        jsrPackages.missingVersion.map((p) => p.name).join(", ")
-      }\n`,
-    );
+  const [npm, npmMissingVersions] = partition(
+    normalizeNpmKeys(npmKeys),
+    ({ version }) => version !== undefined,
+  );
+
+  const [esm, esmMissingVersions] = partition(
+    normalizeEsmKeys(esmKeys),
+    ({ version }) => version !== undefined,
+  );
+
+  if (!silent) {
+    if (jsrMissingVersions.length) {
+      console.warn(
+        `Missing version for JSR packages: ${
+          jsrMissingVersions.map((p) => p.name).join(", ")
+        }\n`,
+      );
+    }
+    if (npmMissingVersions) {
+      console.warn(
+        `Missing version for NPM packages: ${
+          npmMissingVersions.map((p) => p.name).join(", ")
+        }\n`,
+      );
+    }
+    if (esmMissingVersions) {
+      console.warn(
+        `Missing version for ESM packages: ${
+          esmMissingVersions.map((p) => p.name).join(", ")
+        }\n`,
+      );
+    }
   }
-  if (npmPackages.missingVersion) {
-    console.warn(
-      `Missing version for NPM packages: ${
-        npmPackages.missingVersion.map((p) => p.name).join(", ")
-      }\n`,
-    );
-  }
-  if (esmPackages.missingVersion) {
-    console.warn(
-      `Missing version for ESM packages: ${
-        esmPackages.missingVersion.map((p) => p.name).join(", ")
-      }\n`,
-    );
-  }
+
+  const toIgnore = [...File.readAuditIgnore(), ...(ignore || [])];
 
   return {
-    jsr: jsrPackages.valid ?? [],
-    npm: npmPackages.valid ?? [],
-    esm: esmPackages.valid ?? [],
+    jsr: jsr.filter(({ name }) => !toIgnore?.find((i) => i === name)),
+    npm: npm.filter(({ name }) => !toIgnore?.find((i) => i === name)),
+    esm: esm.filter(({ name }) => !toIgnore?.find((i) => i === name)),
   };
 };
