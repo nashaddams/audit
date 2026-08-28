@@ -1,7 +1,7 @@
 export const snapshot = {};
 
 snapshot[`report fallback 1`] = `
-"## amqp \`jsr\`
+"## amqp 1.0.0 \`jsr\`
 
 \`\`\`
 Title: N/A

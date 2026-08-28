@@ -11,7 +11,7 @@ export type GithubAdvisories =
 /** @internal */
 export type Pkg = {
   name: string;
-  version?: string;
+  version: string;
 };
 
 /** @internal */

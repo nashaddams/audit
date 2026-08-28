@@ -4,6 +4,7 @@
     "": {
       "name": "npm",
       "dependencies": {
+        "@std/collections": "npm:@jsr/std__collections",
         "axios": "^1.8.3",
         "cowsay": "^1.6.0",
         "express": "^4.21.2",
@@ -168,6 +169,8 @@
     "@shikijs/types": ["@shikijs/types@2.5.0", "", { "dependencies": { "@shikijs/vscode-textmate": "^10.0.2", "@types/hast": "^3.0.4" } }, "sha512-ygl5yhxki9ZLNuNpPitBWvcy9fsSKKaRuO4BAlMyagszQidxcpLAr0qiW/q43DtSIDxO6hEbtYLiFZNXO/hdGw=="],
 
     "@shikijs/vscode-textmate": ["@shikijs/vscode-textmate@10.0.2", "", {}, "sha512-83yeghZ2xxin3Nj8z1NMd/NCuca+gsYXswywDy5bHvwlWL8tpTQmzGeUuHd9FC3E/SBEMvzJRwWEOz5gGes9Qg=="],
+
+    "@std/collections": ["@jsr/std__collections@1.0.10", "https://npm.jsr.io/~/11/@jsr/std__collections/1.0.10.tgz", {}, "sha512-/FlggygpgekjQKToZZ9a1YjJXe2iVoAaVcvToRVMZ6Bs/oGLQ8efHY4ApZZfLwBk+SsKU7mFizyAYYxvGOuAHg=="],
 
     "@types/estree": ["@types/estree@1.0.6", "", {}, "sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw=="],
 

@@ -6,7 +6,7 @@ import { audit } from "../../mod.ts";
 import { Api } from "../../src/api.ts";
 import { createAdvisory, createVulnerability } from "../utils.ts";
 
-export const axiosAdvisories = [
+const axiosAdvisories = [
   createAdvisory({
     vulnerabilities: [
       createVulnerability({
@@ -20,12 +20,26 @@ export const axiosAdvisories = [
   }),
 ];
 
+const stdCollectionsAdvisories = [
+  createAdvisory({
+    vulnerabilities: [
+      createVulnerability({
+        package: {
+          ecosystem: "other",
+          name: "@std/collections",
+        },
+        vulnerable_version_range: ">=1.0.10",
+      }),
+    ],
+  }),
+];
+
 describe("[audit] package-lock", () => {
   afterEach(() => {
     Deno.removeSync(".audit", { recursive: true });
   });
 
-  it("should audit NPM packages", async (t) => {
+  it("should audit NPM and JSR packages", async (t) => {
     // deno-lint-ignore no-unused-vars
     using fetchNpmPkgStub = stub(
       Api,
@@ -40,12 +54,25 @@ describe("[audit] package-lock", () => {
     );
 
     // deno-lint-ignore no-unused-vars
+    using fetchJsrPkgStub = stub(
+      Api,
+      "fetchJsrPkg",
+      async ({ scope, pkg }) => {
+        return await Promise.resolve({
+          githubRepository: { owner: scope, name: pkg },
+        });
+      },
+    );
+
+    // deno-lint-ignore no-unused-vars
     using fetchGithubAdvisoriesStub = stub(
       Api,
       "fetchGithubAdvisories",
       async ({ repo }) => {
         if (repo === "axios") {
           return await Promise.resolve(axiosAdvisories);
+        } else if (repo === "collections") {
+          return await Promise.resolve(stdCollectionsAdvisories);
         } else {
           return await Promise.resolve([]);
         }

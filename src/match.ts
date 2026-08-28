@@ -42,11 +42,6 @@ const transformVersionRanges = (versionRange: string): string => {
 /** @internal */
 export const match = (pkgs: PkgResolved[]): PkgResolved[] => {
   return pkgs.filter((pkg) => {
-    if (!pkg.version) {
-      console.warn(`\nNo version found for ${pkg.name}`);
-      return false;
-    }
-
     const pkgVersion = parse(pkg.version);
     const vulnerabilityVersions: (SemVer | Range)[] = (pkg.advisories ?? [])
       .flatMap((a) =>

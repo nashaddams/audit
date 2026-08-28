@@ -8,6 +8,7 @@ describe("report", () => {
       pkgs: [{
         origin: "jsr",
         name: "amqp",
+        version: "1.0.0",
         advisories: [{
           ghsa_id: "",
           cve_id: null,

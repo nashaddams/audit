@@ -28,12 +28,6 @@ describe("match versions", () => {
     assertEquals(matched.length, 0);
   });
 
-  it("should not match for missing package version", () => {
-    const pkg = createVulnPkg("", "1.2.3");
-    const matched = match([pkg]);
-    assertEquals(matched.length, 0);
-  });
-
   it("should not match for missing advisories", () => {
     const pkg = {
       ...createVulnPkg("1.2.3", "1.2.3"),

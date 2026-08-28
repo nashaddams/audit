@@ -9,6 +9,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@std/collections": "npm:@jsr/std__collections@^1.0.10",
     "axios": "^1.8.3",
     "cowsay": "^1.6.0",
     "express": "^4.21.2",
