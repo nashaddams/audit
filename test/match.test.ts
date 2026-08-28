@@ -21,6 +21,40 @@ describe("match versions", () => {
     const matched = match([pkg]);
     assertEquals(matched.length, 0);
   });
+
+  it("should not match for invalid versions", () => {
+    const pkg = createVulnPkg("1.2.3", "invalid-version");
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+
+  it("should not match for missing package version", () => {
+    const pkg = createVulnPkg("", "1.2.3");
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+
+  it("should not match for missing advisories", () => {
+    const pkg = {
+      ...createVulnPkg("1.2.3", "1.2.3"),
+      advisories: [],
+    };
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+
+  it("should not match for missing vulnerabilities", () => {
+    const pkg = createVulnPkg("1.2.3", "1.2.3");
+    const pkgWithoutVulns = {
+      ...pkg,
+      advisories: pkg.advisories?.map((a) => ({
+        ...a,
+        vulnerabilities: null,
+      })),
+    };
+    const matched = match([pkgWithoutVulns]);
+    assertEquals(matched.length, 0);
+  });
 });
 
 describe("match version ranges", () => {
@@ -60,24 +94,6 @@ describe("match version ranges", () => {
     assertEquals(matched.length, 1);
   });
 
-  it("should match for combined version ranges (comma, dash) 1", () => {
-    const pkg = createVulnPkg(
-      "7.25.9",
-      "<7.26.10, 8.0.0-alpha.0 - 8.0.0-alpha.16",
-    );
-    const matched = match([pkg]);
-    assertEquals(matched.length, 1);
-  });
-
-  it("should match for combined version ranges (comma, dash) 2", () => {
-    const pkg = createVulnPkg(
-      "8.0.0-alpha.3",
-      "<7.26.10, 8.0.0-alpha.0 - 8.0.0-alpha.16",
-    );
-    const matched = match([pkg]);
-    assertEquals(matched.length, 1);
-  });
-
   it("should not match for smaller version range", () => {
     const pkg = createVulnPkg("1.2.3", "< 1.2.3");
     const matched = match([pkg]);
@@ -107,27 +123,9 @@ describe("match version ranges", () => {
     const matched = match([pkg]);
     assertEquals(matched.length, 0);
   });
-
-  it("should not match for combined version ranges (comma, dash) 1", () => {
-    const pkg = createVulnPkg(
-      "7.27.0",
-      "<7.26.10, 8.0.0-alpha.0 - 8.0.0-alpha.16",
-    );
-    const matched = match([pkg]);
-    assertEquals(matched.length, 0);
-  });
-
-  it("should not match for combined version ranges (comma, dash) 2", () => {
-    const pkg = createVulnPkg(
-      "8.0.0-alpha.17",
-      "<7.26.10, 8.0.0-alpha.0 - 8.0.0-alpha.16",
-    );
-    const matched = match([pkg]);
-    assertEquals(matched.length, 0);
-  });
 });
 
-describe("match multiple", () => {
+describe("match multiple version ranges", () => {
   it("should match if only one range applies", () => {
     const pkg = createVulnPkg("1.2.3", "<= 1.2.3", ">= 2.0.0");
     const matched = match([pkg]);
@@ -148,6 +146,74 @@ describe("match multiple", () => {
 
   it("should not match mixing versions with version ranges", () => {
     const pkg = createVulnPkg("1.2.2", "1.2.3", ">= 2.0.0");
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+});
+
+describe("match version ranges with a dash", () => {
+  it("should match for version ranges with a dash", () => {
+    const pkg = createVulnPkg("8.0.2", "8.0.1 - 8.0.2");
+    const matched = match([pkg]);
+    assertEquals(matched.length, 1);
+  });
+
+  it("should match for prerelease version ranges with a dash", () => {
+    const pkg = createVulnPkg(
+      "8.0.0-alpha.3",
+      "8.0.0-alpha.0 - 8.0.0-alpha.16",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 1);
+  });
+
+  it("should match for version ranges with a dash and a regular range", () => {
+    const pkg = createVulnPkg(
+      "7.25.9",
+      "<7.26.10, 8.0.0-alpha.0 - 8.0.0-alpha.16",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 1);
+  });
+
+  it("should match for prerelease version ranges with a dash and a regular range", () => {
+    const pkg = createVulnPkg(
+      "8.0.0-alpha.3",
+      "<7.26.10, 8.0.0-alpha.0 - 8.0.0-alpha.16",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 1);
+  });
+
+  it("should not match for version ranges with a dash", () => {
+    const pkg = createVulnPkg("8.0.0", "8.0.1 - 8.0.2");
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+
+  it("should not match for prerelease version ranges with a dash", () => {
+    const pkg = createVulnPkg(
+      "8.0.0-alpha.17",
+      "8.0.0-alpha.0 - 8.0.0-alpha.16",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+
+  it("should not match for version ranges with a dash and a regular range", () => {
+    const pkg = createVulnPkg(
+      "7.27.0",
+      "<7.26.10, 8.0.0-alpha.0 - 8.0.0-alpha.16",
+    );
+    const matched = match([pkg]);
+    assertEquals(matched.length, 0);
+  });
+
+  it("should not match for prerelease version ranges with a dash and a regular range", () => {
+    const pkg = createVulnPkg(
+      "8.0.0-alpha.17",
+      "<7.26.10, 8.0.0-alpha.0 - 8.0.0-alpha.16",
+    );
     const matched = match([pkg]);
     assertEquals(matched.length, 0);
   });
