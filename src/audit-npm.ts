@@ -98,12 +98,11 @@ export const auditNpm: RunAudit = async (
         auditJson.vulnerabilities &&
         Object.keys(auditJson.vulnerabilities).length > 0
       ) {
-        const report = createReport(auditJson);
+        const reportString = createReport(auditJson);
 
-        File.writeReport(outputDir, report);
-        File.writeReportHtml(outputDir, report);
+        File.writeReport(outputDir, reportString);
 
-        if (!silent) console.info(report);
+        if (!silent) console.info(reportString);
       } else {
         if (!silent) console.info("\nNo vulnerabilities found.");
       }

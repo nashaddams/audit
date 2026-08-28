@@ -51,9 +51,7 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 
   Deno.mkdirSync(outputDir);
 
-  const reportHeader = "# Audit report\n";
-  File.writeReport(outputDir, reportHeader);
-  File.writeReportHtml(outputDir, reportHeader);
+  File.writeReport(outputDir, "# Audit report\n");
 
   if (!silent) {
     console.info(`Using lock file: %c${lock}\n`, "font-weight: bold");
@@ -70,6 +68,8 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
     silent,
     outputDir,
   });
+
+  File.generateHtmlReport(outputDir);
 
   return jsrAuditCode || npmAuditCode;
 };
@@ -124,8 +124,8 @@ export const runAudit = async (): Promise<void> => {
           () => new Response(auditHtml),
         );
       } catch (err) {
-        console.info(`No audit report found in ${outputDir}`);
         if (!(err instanceof Deno.errors.NotFound)) throw err;
+        console.info(`No audit report found at ${outputDir}/report.html`);
       }
     })
     .parse();
