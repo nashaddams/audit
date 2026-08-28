@@ -25,7 +25,7 @@ const inferNameAndVersion = (
 };
 
 /** @internal */
-export default {
+const resolver: Resolver<"deno-lock", ["jsr", "denoland", "npm", "esm"]> = {
   name: "deno-lock",
   extract(path) {
     const { jsr, npm, remote }: {
@@ -154,4 +154,6 @@ export default {
       },
     },
   },
-} satisfies Resolver<"deno-lock", ["jsr", "denoland", "npm", "esm"]>;
+};
+
+export default resolver;

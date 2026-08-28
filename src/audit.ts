@@ -17,9 +17,9 @@ const DEFAULT_RESOLVER: keyof typeof ResolverRegistry = "deno-lock";
 
 /** Options for the {@link audit} function. */
 export type AuditOptions = {
-  /** Minimum severity of an advisory vulnerability, only affects the return code (default: `high`) */
+  /** Minimum severity of an advisory vulnerability, only affects the return code (default: `medium`) */
   severity?: Severity;
-  /** Path to the Deno lock file (default: `deno.lock`) */
+  /** Path to the lock file (default: `deno.lock`) */
   lockFile?: string;
   /** Configuration file path (default: `audit.json`) */
   configFile?: string;
@@ -117,7 +117,7 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
     .version(denoJson.version)
     .versionOption(
       "-v, --version",
-      "Print the version.",
+      "Print version.",
       function (this: Command) {
         console.info(this.getVersion());
       },
@@ -137,7 +137,7 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
     )
     .option(
       "-l, --lock-file <lock-file:file>",
-      "Deno lock file (v4) to audit.",
+      "Lock file to audit (Deno v4, NPM v3).",
       {
         default: DEFAULT_LOCK_FILE,
       },
@@ -150,10 +150,9 @@ export const runAudit = async (args = Deno.args): Promise<void> => {
     })
     .option(
       "-r, --resolver <resolver:resolver>",
-      "Resolver to use.",
+      "Resolver used to parse the lock file.",
       {
         default: DEFAULT_RESOLVER,
-        hidden: true,
       },
     )
     .action(
