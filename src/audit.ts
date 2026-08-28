@@ -83,13 +83,15 @@ export const runAudit = async (): Promise<void> => {
     .description("A basic Deno audit tool for JSR, NPM, and ESM packages.")
     .version(denoJson.version)
     .type("severity", new EnumType(severities))
-    .option("-l, --lock <lock:file>", "The Deno lock file to audit.", {
+    .option("-l, --lock <lock-file:file>", "Deno lock file (v4) to audit.", {
       default: DEFAULT_LOCK_FILE,
     })
     .option(
-      "-s, --severity <name:severity>",
-      "The minimum severity of an advisory vulnerability (only affects the return code)",
-      { default: DEFAULT_SEVERITY },
+      "-s, --severity <severity:severity>",
+      "Minimum severity (only affects the return code).",
+      {
+        default: DEFAULT_SEVERITY,
+      },
     )
     .option("-v, --verbose", "Verbose console output.", {
       default: DEFAULT_VERBOSITY,
@@ -97,14 +99,14 @@ export const runAudit = async (): Promise<void> => {
     .option("--silent", "Mute console output.", {
       default: DEFAULT_SILENCE,
     })
-    .option("-o, --output-dir <output-dir:file>", "Output directory", {
+    .option("-o, --output-dir <output-dir:file>", "Output directory.", {
       default: DEFAULT_OUTPUT_DIR,
     })
     .action(async ({ lock, severity, verbose, silent, outputDir }) => {
       const code = await audit({ lock, severity, verbose, silent, outputDir });
       Deno.exit(code);
     })
-    .command("report", "Serve the generated audit reports")
+    .command("report", "Serve the generated audit report")
     .option("-o, --output-dir <output-dir:file>", "Output directory", {
       default: DEFAULT_OUTPUT_DIR,
     })
