@@ -8,8 +8,10 @@ snapshot[`All 1`] = `
 \`\`\`
 Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
 Severity: low
+Published: 2024-11-22
 Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
 CVE: CVE-2024-52793
+CWE: CWE-80: Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)
 GHSA: GHSA-32fx-h446-h8pf
 
 Affected package: @std/http (other)
@@ -19,8 +21,10 @@ Patched versions: 1.0.11
 \`\`\`
 Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
 Severity: low
+Published: 2024-11-22
 Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
 CVE: CVE-2024-52793
+CWE: CWE-80: Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)
 GHSA: GHSA-32fx-h446-h8pf
 
 Affected package: @std/http (other)
