@@ -29,7 +29,7 @@ deno run -A jsr:@nashaddams/audit [--help]
 
 Running this command will print the audit results to the console, create a
 report in the output directory, and return an exit code indicating if
-vulnerabilities have been found (`1`) or not (`0`).
+vulnerabilities have been found and matched (`1`) or not (`0`).
 
 ### Via `import`
 

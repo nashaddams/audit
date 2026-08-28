@@ -83,9 +83,7 @@ export const Api: Api = {
   },
   fetchNpmPkg: async ({ pkg }) => {
     // `https://www.npmjs.com/package/${pkg}/v/${version}/provenance`,
-    const res = await fetch(
-      `https://registry.npmjs.org/${pkg}`,
-    );
+    const res = await fetch(`https://registry.npmjs.org/${pkg}`);
 
     try {
       const json = await res.json() as NpmPkg;
@@ -127,10 +125,7 @@ export const Api: Api = {
 
       return json;
     } catch (err) {
-      console.warn(
-        `Unable to fetch advisories from ${owner}/${repo}`,
-        err,
-      );
+      console.warn(`Unable to fetch advisories from ${owner}/${repo}`, err);
       return null;
     }
   },
