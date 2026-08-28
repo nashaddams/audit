@@ -66,10 +66,17 @@ const resolver: Resolver<"deno-lock", ["jsr", "denoland", "npm", "esm"]> = {
     },
     npm: {
       normalize(keys) {
-        // NPM keys may contain chained packages with `_` and `+` delimiters
+        /**
+         * NPM keys may contain:
+         * - chained packages with one or more `_` delimiters
+         * - packages with `+` instead of `/`
+         * - packages with `_` in their name (e.g. `fast_array_intersect@1.1.0`)
+         */
         return keys
-          .flatMap((key) => key.includes("_") ? key.split("_") : key)
           .map((key) => key.replaceAll("+", "/"))
+          .flatMap((k) => k.match(/(@?[a-z0-9_\.\-\/]+@\d+\.\d+\.\d+)/gi))
+          .map((k) => k?.replace(/^_+/, "") ?? null)
+          .filter((m) => m !== null)
           .map(inferNameAndVersion)
           .filter((pkg) => pkg !== null);
       },
