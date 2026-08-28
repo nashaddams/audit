@@ -5,6 +5,31 @@ snapshot[`All 1`] = `
 
 ## JSR
 
+### @hono/hono (4.6.14)
+
+\`\`\`
+Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
+Severity: low
+Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
+CVE: CVE-2024-52793
+GHSA: GHSA-32fx-h446-h8pf
+
+Affected package: @std/http (other)
+Affected versions: <= 1.0.10
+Patched versions: 1.0.11
+\`\`\`
+\`\`\`
+Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
+Severity: low
+Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
+CVE: CVE-2024-52793
+GHSA: GHSA-32fx-h446-h8pf
+
+Affected package: @std/http (other)
+Affected versions: <= 1.0.10
+Patched versions: 1.0.11
+\`\`\`
+
 ### @logtape/logtape (0.8.0)
 
 \`\`\`

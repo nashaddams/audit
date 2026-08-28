@@ -38,7 +38,14 @@ const normalizeJsrKeys = (keys: string[]): Pkg[] => {
   return deduplicate(keys.map(inferNameAndVersion));
 };
 
-const normalizeNpmKeys = normalizeJsrKeys;
+const normalizeNpmKeys = (keys: string[]): Pkg[] => {
+  return deduplicate(
+    // NPM keys may contain chained packages with `_` and `+` delimiters
+    keys.flatMap((key) => key.includes("_") ? key.split("_") : key).map((key) =>
+      key.replaceAll("+", "/")
+    ).map(inferNameAndVersion),
+  );
+};
 
 const normalizeEsmKeys = (keys: string[]): Pkg[] => {
   return deduplicate(keys.map((key) => {
