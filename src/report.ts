@@ -21,12 +21,12 @@ export const Report: Report = {
           advisories?.flatMap((advisory) => {
             return [
               "```",
-              `Title: ${advisory.summary ?? fallback}`,
+              `Title: ${advisory.summary || fallback}`,
               `Severity: ${advisory.severity ?? fallback}`,
               `Published: ${
                 advisory.published_at?.substring(0, 10) ?? fallback
               }`,
-              `Details: ${advisory.html_url ?? fallback}`,
+              `Details: ${advisory.html_url || fallback}`,
               `CVE: ${advisory.cve_id ?? fallback}`,
               `CWE: ${
                 advisory.cwes?.length
@@ -35,7 +35,7 @@ export const Report: Report = {
                     .join(", ")
                   : fallback
               }`,
-              `GHSA: ${advisory.ghsa_id ?? fallback}`,
+              `GHSA: ${advisory.ghsa_id || fallback}`,
               "",
               advisory.vulnerabilities?.flatMap((vulnerability) => {
                 return [
