@@ -3,5 +3,20 @@ export const snapshot = {};
 snapshot[`NPM only 1`] = `
 "# Audit report
 
+## @algolia/autocomplete-core 1.17.9 \`npm\`
+
+\`\`\`
+Title: Possible SSRF and Credential Leakage via Absolute URL in axios Requests
+Severity: medium
+Published: 2025-03-07
+Details: https://github.com/axios/axios/security/advisories/GHSA-jr5f-v2jv-69x6
+CVE: CVE-2025-27152
+CWE: N/A
+GHSA: GHSA-jr5f-v2jv-69x6
+
+Affected package: axios (npm)
+Affected versions: <= 1.29.9
+Patched versions: 1.30.2
+\`\`\`
 "
 `;

@@ -3,33 +3,20 @@ export const snapshot = {};
 snapshot[`JSR only 1`] = `
 "# Audit report
 
-## @logtape/logtape 0.8.0 \`jsr\`
+## @hono/hono 4.6.4 \`jsr\`
 
 \`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Published: 2024-11-22
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-CWE: CWE-80: Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)
-GHSA: GHSA-32fx-h446-h8pf
+Title: Bypass CSRF Middleware by a request without Content-Type header
+Severity: medium
+Published: 2024-10-15
+Details: https://github.com/honojs/hono/security/advisories/GHSA-2234-fmw7-43wr
+CVE: CVE-2024-48913
+CWE: CWE-352: Cross-Site Request Forgery (CSRF)
+GHSA: GHSA-2234-fmw7-43wr
 
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
-\`\`\`
-\`\`\`
-Title: XSS vulnerability in serveDir API of @std/http/file-server on POSIX systems
-Severity: low
-Published: 2024-11-22
-Details: https://github.com/denoland/std/security/advisories/GHSA-32fx-h446-h8pf
-CVE: CVE-2024-52793
-CWE: CWE-80: Improper Neutralization of Script-Related HTML Tags in a Web Page (Basic XSS)
-GHSA: GHSA-32fx-h446-h8pf
-
-Affected package: @std/http (other)
-Affected versions: <= 1.0.10
-Patched versions: 1.0.11
+Affected package: hono (npm)
+Affected versions: < 4.6.5
+Patched versions: 4.6.5
 \`\`\`
 "
 `;

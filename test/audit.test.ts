@@ -3,7 +3,19 @@ import { type Stub, stub } from "@std/testing/mock";
 import { assertSnapshot } from "@std/testing/snapshot";
 import { audit } from "../mod.ts";
 import { Api } from "../src/api.ts";
-import { githubAdvisories } from "./mock/github-advisories.ts";
+import type { GithubAdvisories } from "../src/types.ts";
+import jsrAdvisories from "./examples/jsr-only/advisories.json" with {
+  type: "json",
+};
+import npmAdvisories from "./examples/npm-only/advisories.json" with {
+  type: "json",
+};
+import esmAdvisories from "./examples/esm-only/advisories.json" with {
+  type: "json",
+};
+import allAdvisories from "./examples/all/advisories.json" with {
+  type: "json",
+};
 
 describe("audit", () => {
   let fetchJsrPkgStub: Stub | undefined = undefined;
@@ -45,11 +57,6 @@ describe("audit", () => {
           },
         }),
     );
-    fetchGithubAdvisoriesStub = stub(
-      Api,
-      "fetchGithubAdvisories",
-      async () => await Promise.resolve(githubAdvisories),
-    );
   });
 
   afterEach(() => {
@@ -69,6 +76,12 @@ describe("audit", () => {
   });
 
   it("should audit JSR packages", async (t) => {
+    fetchGithubAdvisoriesStub = stub(
+      Api,
+      "fetchGithubAdvisories",
+      async () => await Promise.resolve(jsrAdvisories as GithubAdvisories),
+    );
+
     await audit({
       lock: "test/examples/jsr-only/deno.lock",
       severity: "low",
@@ -81,6 +94,12 @@ describe("audit", () => {
   });
 
   it("should audit NPM packages", async (t) => {
+    fetchGithubAdvisoriesStub = stub(
+      Api,
+      "fetchGithubAdvisories",
+      async () => await Promise.resolve(npmAdvisories as GithubAdvisories),
+    );
+
     await audit({
       lock: "test/examples/npm-only/deno.lock",
       severity: "low",
@@ -93,6 +112,12 @@ describe("audit", () => {
   });
 
   it("should audit ESM packages", async (t) => {
+    fetchGithubAdvisoriesStub = stub(
+      Api,
+      "fetchGithubAdvisories",
+      async () => await Promise.resolve(esmAdvisories as GithubAdvisories),
+    );
+
     await audit({
       lock: "test/examples/esm-only/deno.lock",
       severity: "low",
@@ -105,6 +130,12 @@ describe("audit", () => {
   });
 
   it("should audit all packages", async (t) => {
+    fetchGithubAdvisoriesStub = stub(
+      Api,
+      "fetchGithubAdvisories",
+      async () => await Promise.resolve(allAdvisories as GithubAdvisories),
+    );
+
     await audit({
       lock: "test/examples/all/deno.lock",
       severity: "low",
