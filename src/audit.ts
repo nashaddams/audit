@@ -62,7 +62,8 @@ export const audit = async (options?: AuditOptions): Promise<number> => {
 
         if (toIgnore) {
           const filteredAdvisories = r.advisories?.filter((a) =>
-            !toIgnore.find((cve) => cve === a.cve_id)
+            !toIgnore.find((cve) => cve === a.cve_id) &&
+            !toIgnore.find((ghsa) => ghsa === a.ghsa_id)
           );
 
           if (filteredAdvisories?.length) {

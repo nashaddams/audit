@@ -55,7 +55,7 @@ deno run -A jsr:@nashaddams/audit report
 ### Ignoring vulnerabilities
 
 Vulnerabilities for a specific package can be excluded by adding the package
-name and CVE ID(s) to an `audit.json` file:
+name and CVE ID(s) or GHSA ID(s) to an `audit.json` file:
 
 ```json
 {
