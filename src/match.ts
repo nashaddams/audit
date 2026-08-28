@@ -16,6 +16,7 @@ export const match = (pkgs: PkgResolved[]): PkgResolved[] => {
   if (pkgs.length) {
     return pkgs.filter((pkg) => {
       if (!pkg.version) {
+        console.warn(`\nNo version found for ${pkg.name}`);
         return true;
       }
 
@@ -26,7 +27,6 @@ export const match = (pkgs: PkgResolved[]): PkgResolved[] => {
         )
         .filter((vv): vv is string => typeof vv === "string")
         .map((vulnVersion) => {
-          // console.log("@@@@@@@@@@@@", vulnVersion);
           let version: SemVer | Range | undefined =
             tryParseRange(vulnVersion) ?? tryParse(vulnVersion);
 
@@ -38,6 +38,9 @@ export const match = (pkgs: PkgResolved[]): PkgResolved[] => {
             console.warn(
               `\nUnable to parse version for ${pkg.name}@${pkg.version}`,
             );
+            console.warn(`Package version: ${pkg.version}`);
+            console.warn(`Vulnerability version: ${vulnVersion}`);
+
             return undefined;
           }
 
@@ -45,16 +48,20 @@ export const match = (pkgs: PkgResolved[]): PkgResolved[] => {
         })
         .filter((vv): vv is SemVer | Range => isSemVer(vv) || isRange(vv));
 
+      let isVulnerable = true;
+
       for (const vv of vulnerabilityVersions) {
         if (
           (isRange(vv) && greaterThanRange(pkgVersion, vv)) ||
           (isSemVer(vv) && greaterThan(pkgVersion, vv))
         ) {
-          return false;
+          isVulnerable = false;
+        } else {
+          isVulnerable = true;
         }
       }
 
-      return true;
+      return isVulnerable;
     });
   }
 
