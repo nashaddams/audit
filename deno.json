@@ -1,19 +1,19 @@
 {
   "name": "@nashaddams/audit",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "license": "MIT",
   "exports": "./mod.ts",
   "imports": {
     "@cliffy/command": "jsr:@cliffy/command@1.0.0-rc.7",
     "@deno/gfm": "jsr:@deno/gfm@0.10.0",
-    "@octokit/plugin-rest-endpoint-methods": "npm:@octokit/plugin-rest-endpoint-methods@13.2.6",
-    "@std/cli/unstable-spinner": "jsr:@std/cli@1.0.9/unstable-spinner",
-    "@std/collections/intersect": "jsr:@std/collections@1.0.9/intersect",
-    "@std/collections/partition": "jsr:@std/collections@1.0.9/partition",
-    "@std/assert": "jsr:@std/assert@1.0.10",
-    "@std/testing/bdd": "jsr:@std/testing@1.0.8/bdd",
-    "@std/testing/mock": "jsr:@std/testing@1.0.8/mock",
-    "@std/testing/snapshot": "jsr:@std/testing@1.0.8/snapshot"
+    "@octokit/plugin-rest-endpoint-methods": "npm:@octokit/plugin-rest-endpoint-methods@13.3.1",
+    "@std/cli/unstable-spinner": "jsr:@std/cli@1.0.13/unstable-spinner",
+    "@std/collections/intersect": "jsr:@std/collections@1.0.10/intersect",
+    "@std/collections/partition": "jsr:@std/collections@1.0.10/partition",
+    "@std/assert": "jsr:@std/assert@1.0.11",
+    "@std/testing/bdd": "jsr:@std/testing@1.0.9/bdd",
+    "@std/testing/mock": "jsr:@std/testing@1.0.9/mock",
+    "@std/testing/snapshot": "jsr:@std/testing@1.0.9/snapshot"
   },
   "tasks": {
     "build": "deno compile -RW=. -E=GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.jsr.io,cdn.deno.land,api.github.com,0.0.0.0 --allow-run=\"npm\" -o dist/audit mod.ts",
