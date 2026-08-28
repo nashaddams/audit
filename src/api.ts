@@ -39,6 +39,9 @@ type Api = {
   fetchGithubAdvisories: (
     options: { owner: string; repo: string },
   ) => Promise<GithubAdvisories | null>;
+  fetchLicense: (
+    options: { owner?: string; repo?: string },
+  ) => Promise<string | null>;
 };
 
 /** @internal */
@@ -108,17 +111,15 @@ export const Api: Api = {
     }
   },
   fetchGithubAdvisories: async ({ owner, repo }) => {
-    const githubToken: string | undefined = Env.GITHUB_TOKEN;
-
     const res = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/security-advisories`,
       {
         headers: {
           "Accept": "application/vnd.github+json",
           "X-GitHub-Api-Version": "2022-11-28",
-          ...(githubToken
+          ...(Env.GITHUB_TOKEN
             ? {
-              "Authorization": `Bearer ${githubToken}`,
+              "Authorization": `Bearer ${Env.GITHUB_TOKEN}`,
             }
             : {}),
         },
@@ -138,6 +139,37 @@ export const Api: Api = {
       File.writeUnresolvedPackage(
         `${owner}/${repo} (missing GitHub advisories)`,
       );
+      return null;
+    }
+  },
+  fetchLicense: async (
+    { owner, repo },
+  ) => {
+    const res = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/license`,
+      {
+        headers: {
+          "Accept": "application/vnd.github.raw+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+          ...(Env.GITHUB_TOKEN
+            ? {
+              "Authorization": `Bearer ${Env.GITHUB_TOKEN}`,
+            }
+            : {}),
+        },
+      },
+    );
+
+    try {
+      const license = await res.text();
+
+      if (!res.ok) {
+        throw new Error(JSON.stringify(license, null, 2));
+      }
+
+      return license;
+    } catch (err) {
+      console.warn(`\nUnable to fetch license from ${owner}/${repo}`, err);
       return null;
     }
   },
