@@ -114,14 +114,14 @@ export const extractPackages = (
         }\n`,
       );
     }
-    if (npmMissingVersions) {
+    if (npmMissingVersions.length) {
       console.warn(
         `Missing version for NPM packages: ${
           npmMissingVersions.map((p) => p.name).join(", ")
         }\n`,
       );
     }
-    if (esmMissingVersions) {
+    if (esmMissingVersions.length) {
       console.warn(
         `Missing version for ESM packages: ${
           esmMissingVersions.map((p) => p.name).join(", ")
