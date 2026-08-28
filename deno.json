@@ -20,19 +20,12 @@
   },
   "tasks": {
     "lint": "deno lint && deno fmt --check && deno publish --dry-run --allow-dirty",
-    "build": "deno compile -RW=. -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.jsr.io,cdn.deno.land,api.github.com,registry.npmjs.org,0.0.0.0 -o dist/audit mod.ts",
-    "audit": "deno run -RW=. -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.jsr.io,cdn.deno.land,api.github.com,registry.npmjs.org mod.ts",
-    "report": "deno run -R=. -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=0.0.0.0 mod.ts report",
-    "licenses": "deno run -RW=. -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.github.com mod.ts licenses",
-    "test": "deno test -RW -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,NO_COLOR,FORCE_COLOR,TERM -N=api.jsr.io,api.github.com,cdn.deno.land,registry.npmjs.org --coverage=cov",
-    "coverage:lcov": "deno coverage --exclude=test --lcov cov > cov.lcov",
-    "coverage:html": "deno coverage --html --exclude=test cov",
-    "coverage:console": "deno coverage --exclude=test cov",
-    "coverage": "deno task coverage:lcov && deno task coverage:html && deno task coverage:console",
-    "coverage:report": {
-      "command": "deno eval \"import { serveDir } from 'jsr:@std/http/file-server'; Deno.serve((req: Request) => serveDir(req, { fsRoot: 'cov/html' }));\"",
-      "dependencies": ["coverage"]
-    },
+    "build": "deno compile -RW=. -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,TERM -N=api.jsr.io,cdn.deno.land,api.github.com,registry.npmjs.org,0.0.0.0 -o dist/audit mod.ts",
+    "audit": "deno run -RW=. -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,TERM -N=api.jsr.io,cdn.deno.land,api.github.com,registry.npmjs.org mod.ts",
+    "report": "deno run -R=. -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,TERM -N=0.0.0.0 mod.ts report",
+    "licenses": "deno run -RW=. -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,TERM -N=api.github.com mod.ts licenses",
+    "test": "deno test -RW -E=OUTPUT_DIR,CONFIG_FILE,GITHUB_TOKEN,CI -N=api.jsr.io,api.github.com,cdn.deno.land,registry.npmjs.org --coverage",
+    "coverage:report": "deno eval \"import { serveDir } from 'jsr:@std/http/file-server'; Deno.serve((req: Request) => serveDir(req, { fsRoot: 'coverage/html' }));\"",
     "doc": "deno doc --html mod.ts && deno doc --lint mod.ts",
     "doc:report": {
       "command": "deno eval \"import { serveDir } from 'jsr:@std/http/file-server'; Deno.serve((req: Request) => serveDir(req, { fsRoot: 'docs' }));\"",
