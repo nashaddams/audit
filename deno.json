@@ -23,5 +23,13 @@
     "coverage": "deno coverage --exclude=test --lcov cov > cov.lcov && deno coverage --exclude=test cov",
     "doc": "deno doc --html mod.ts"
   },
+  "publish": {
+    "include": [
+      "mod.ts",
+      "src/**/*.ts",
+      "LICENSE",
+      "README.md"
+    ]
+  },
   "lock": false
 }
