@@ -4,37 +4,37 @@ import { stub } from "@std/testing/mock";
 import { assertSnapshot } from "@std/testing/snapshot";
 import { audit } from "../../mod.ts";
 import { Api } from "../../src/api.ts";
+import { File } from "../../src/file.ts";
 import { createAdvisory, createVulnerability } from "../utils.ts";
 
-export const axiosAdvisories = [
+export const honoAdvisories = [
   createAdvisory({
+    ghsa_id: "GSHA-4711",
     vulnerabilities: [
       createVulnerability({
         package: {
-          ecosystem: "npm",
-          name: "axios",
+          ecosystem: "other",
+          name: "hono",
         },
-        vulnerable_version_range: "1.7.1",
+        vulnerable_version_range: "4.6.4",
       }),
     ],
   }),
 ];
 
-describe("[audit] NPM", () => {
+describe("[audit] ignore", () => {
   afterEach(() => {
     Deno.removeSync(".audit", { recursive: true });
   });
 
-  it("should audit NPM packages", async (t) => {
+  it("should ignore packages", async (t) => {
     // deno-lint-ignore no-unused-vars
-    using fetchNpmPkgStub = stub(
+    using fetchJsrPkgStub = stub(
       Api,
-      "fetchNpmPkg",
-      async ({ pkg }) => {
+      "fetchJsrPkg",
+      async ({ scope, pkg }) => {
         return await Promise.resolve({
-          repository: {
-            url: `git+https://github.com/some/${pkg}.git`,
-          },
+          githubRepository: { owner: scope, name: pkg },
         });
       },
     );
@@ -44,20 +44,33 @@ describe("[audit] NPM", () => {
       Api,
       "fetchGithubAdvisories",
       async ({ repo }) => {
-        if (repo === "axios") {
-          return await Promise.resolve(axiosAdvisories);
+        if (repo === "hono") {
+          return await Promise.resolve(honoAdvisories);
         } else {
           return await Promise.resolve([]);
         }
       },
     );
 
-    const code = await audit({ lock: "test/audit/examples/npm/deno.lock" });
-    assertEquals(code, 1);
+    // deno-lint-ignore no-unused-vars
+    using readConfigStub = stub(
+      File,
+      "readConfig",
+      () => {
+        return {
+          ignore: {
+            "@hono/hono": ["GSHA-4711"],
+          },
+        };
+      },
+    );
+
+    const code = await audit({ lock: "test/audit/examples/jsr/deno.lock" });
+    assertEquals(code, 0);
 
     await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {
-      name: "NPM",
-      path: `${import.meta.dirname}/__snapshots__/npm.snap`,
+      name: "ignore",
+      path: `${import.meta.dirname}/__snapshots__/ignore.snap`,
     });
   });
 });

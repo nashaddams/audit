@@ -1,3 +1,4 @@
+import { assertEquals } from "@std/assert";
 import { afterEach, describe, it } from "@std/testing/bdd";
 import { stub } from "@std/testing/mock";
 import { assertSnapshot } from "@std/testing/snapshot";
@@ -51,7 +52,8 @@ describe("[audit] ESM", () => {
       },
     );
 
-    await audit({ lock: "test/audit/examples/esm/deno.lock" });
+    const code = await audit({ lock: "test/audit/examples/esm/deno.lock" });
+    assertEquals(code, 1);
 
     await assertSnapshot(t, Deno.readTextFileSync(".audit/report.md"), {
       name: "ESM",
