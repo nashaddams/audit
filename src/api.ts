@@ -1,44 +1,41 @@
-import type { GitHubAdvisories, JsrPackage } from "./types.ts";
+import type { GitHubAdvisories, JsrPkg } from "./types.ts";
+
+type Api = {
+  fetchJsrPkg: (
+    options: { scope: string; pkg: string },
+  ) => Promise<JsrPkg | null>;
+  fetchGitHubAdvisories: (
+    options: { owner: string; repo: string },
+  ) => Promise<GitHubAdvisories | null>;
+};
 
 /** @internal */
-export const Api = {
-  fetchJsrPackage: async (
-    { jsrScope, jsrPackage }: { jsrScope: string; jsrPackage: string },
-  ): Promise<JsrPackage | null> => {
+export const Api: Api = {
+  fetchJsrPkg: async ({ scope, pkg }) => {
     const res = await fetch(
-      `https://api.jsr.io/scopes/${jsrScope}/packages/${jsrPackage}`,
+      `https://api.jsr.io/scopes/${scope}/packages/${pkg}`,
     );
 
     try {
-      const json = await res.json() as JsrPackage;
-      if (!res.ok) throw new Error(JSON.stringify(json, null, 2));
+      const json = await res.json() as JsrPkg;
+
+      if (!res.ok) {
+        throw new Error(JSON.stringify(json, null, 2));
+      }
+
+      if (!json.githubRepository) {
+        throw new Error("No linked GitHub repository found.");
+      }
+
       return json;
     } catch (err) {
-      console.warn(
-        `Unable to fetch JSR package @${jsrScope}/${jsrPackage}`,
-        err,
-      );
+      console.warn(`Unable to fetch JSR package @${scope}/${pkg}`, err);
       return null;
     }
   },
-  fetchAdvisories: async (
-    { jsrScope, jsrPackage }: { jsrScope: string; jsrPackage: string },
-  ): Promise<GitHubAdvisories | null> => {
-    const pkg = await Api.fetchJsrPackage({ jsrScope, jsrPackage });
-    if (!pkg) return null;
-
-    const { githubRepository } = pkg;
-
-    if (!githubRepository) {
-      console.warn(
-        `No linked GitHub repository for @${jsrScope}/${jsrPackage}`,
-      );
-      return null;
-    }
-
-    const { owner, name } = githubRepository;
+  fetchGitHubAdvisories: async ({ owner, repo }) => {
     const res = await fetch(
-      `https://api.github.com/repos/${owner}/${name}/security-advisories`,
+      `https://api.github.com/repos/${owner}/${repo}/security-advisories`,
       {
         headers: {
           "X-GitHub-Api-Version": "2022-11-28",
@@ -48,11 +45,15 @@ export const Api = {
 
     try {
       const json = await res.json() as GitHubAdvisories;
-      if (!res.ok) throw new Error(JSON.stringify(json, null, 2));
+
+      if (!res.ok) {
+        throw new Error(JSON.stringify(json, null, 2));
+      }
+
       return json;
     } catch (err) {
       console.warn(
-        `Unable to fetch advisories from ${owner}/${name}`,
+        `Unable to fetch advisories from ${owner}/${repo}`,
         err,
       );
       return null;

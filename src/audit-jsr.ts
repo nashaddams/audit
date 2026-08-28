@@ -1,6 +1,6 @@
 import { Spinner } from "@std/cli/unstable-spinner";
 import { intersect } from "@std/collections/intersect";
-import type { GitHubAdvisories, Package, RunAudit, Severity } from "./types.ts";
+import type { GitHubAdvisories, Pkg, RunAudit, Severity } from "./types.ts";
 import { Api } from "./api.ts";
 import { File } from "./file.ts";
 
@@ -11,8 +11,8 @@ const inferSeverities = (severity: Severity): Severity[] => {
   return ["low", "moderate", "high", "critical"];
 };
 
-const createReport = (packageAdvisories: {
-  pkg: Package;
+const createReport = (pkgAdvisories: {
+  pkg: Pkg;
   advisories: GitHubAdvisories;
 }[]): string => {
   const fallback = "N/A";
@@ -20,7 +20,7 @@ const createReport = (packageAdvisories: {
   return [
     "\n## JSR",
     "",
-    packageAdvisories.flatMap(({ pkg, advisories }) => {
+    pkgAdvisories.flatMap(({ pkg, advisories }) => {
       return [
         `### ${pkg.name} (${pkg.version})`,
         "",
@@ -57,34 +57,34 @@ const createReport = (packageAdvisories: {
 
 /** @internal */
 export const auditJsr: RunAudit = async (
-  packages,
+  pkgs,
   { severity, silent, outputDir },
 ) => {
-  if (packages.length > 0) {
+  if (pkgs.length > 0) {
     const spinner = new Spinner({
       message: "Running JSR audit...",
       color: "yellow",
     });
     spinner.start();
 
-    const packageAdvisories: {
-      pkg: Package;
-      advisories: GitHubAdvisories;
-    }[] = [];
+    const pkgAdvisories: { pkg: Pkg; advisories: GitHubAdvisories }[] = [];
 
-    for (const { name, version } of packages) {
+    for (const { name, version } of pkgs) {
       const [scope, pkg] = name.slice(1).split("/");
+      const jsrPkg = await Api.fetchJsrPkg({ scope, pkg });
 
-      const advisories = await Api.fetchAdvisories({
-        jsrScope: scope,
-        jsrPackage: pkg,
-      });
-
-      if (advisories?.length) {
-        packageAdvisories.push({
-          pkg: { name, version },
-          advisories: advisories,
+      if (jsrPkg?.githubRepository) {
+        const advisories = await Api.fetchGitHubAdvisories({
+          owner: jsrPkg.githubRepository.owner,
+          repo: jsrPkg.githubRepository.name,
         });
+
+        if (advisories?.length) {
+          pkgAdvisories.push({
+            pkg: { name, version },
+            advisories: advisories,
+          });
+        }
       }
     }
 
@@ -92,15 +92,15 @@ export const auditJsr: RunAudit = async (
 
     if (!silent) console.info("%cJSR audit", "background-color: yellow");
 
-    if (packageAdvisories.length > 0) {
-      const reportString = createReport(packageAdvisories);
+    if (pkgAdvisories.length > 0) {
+      const reportString = createReport(pkgAdvisories);
 
       File.writeReport(outputDir, reportString);
 
       if (!silent) console.info(reportString);
 
       const severitiesToInclude = inferSeverities(severity);
-      const severities = packageAdvisories.flatMap(({ advisories }) =>
+      const severities = pkgAdvisories.flatMap(({ advisories }) =>
         advisories.map((advisory) => advisory.severity)
       );
 

@@ -1,13 +1,13 @@
 import { Spinner } from "@std/cli/unstable-spinner";
-import type { NpmAuditResult, Package, RunAudit } from "./types.ts";
+import type { NpmAuditResult, Pkg, RunAudit } from "./types.ts";
 import { Cmd } from "./cmd.ts";
 import { File } from "./file.ts";
 
-const createPackageJson = (packages: Package[]): string => {
+const createPackageJson = (pkgs: Pkg[]): string => {
   return [
     "{",
     '  "optionalDependencies": {',
-    packages.flatMap(({ name, version }, i, arr) => {
+    pkgs.flatMap(({ name, version }, i, arr) => {
       return [
         `    "${name}": "${version}"${i !== arr.length - 1 ? "," : ""}`,
       ].join("\n");
@@ -68,10 +68,10 @@ const createReport = (npmAuditResult: NpmAuditResult): string => {
 
 /** @internal */
 export const auditNpm: RunAudit = async (
-  packages,
+  pkgs,
   { severity, silent, outputDir },
 ) => {
-  if (packages.length > 0) {
+  if (pkgs.length > 0) {
     const spinner = new Spinner({
       message: "Running NPM/ESM audit ...",
       color: "red",
@@ -79,7 +79,7 @@ export const auditNpm: RunAudit = async (
     spinner.start();
     await new Promise((r) => setTimeout(r, 182)); // Ensure spinner is shown
 
-    File.writePackageJson(outputDir, createPackageJson(packages));
+    File.writePackageJson(outputDir, createPackageJson(pkgs));
 
     const { stderr: stderrInstall } = Cmd.npmInstall({ outputDir });
 

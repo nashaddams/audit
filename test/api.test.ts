@@ -5,51 +5,47 @@ import { Api } from "../src/api.ts";
 
 describe("api", () => {
   it("should fetch a JSR package", async () => {
-    const jsrPackage = await Api.fetchJsrPackage({
-      jsrScope: "nashaddams",
-      jsrPackage: "audit",
-    });
+    const pkg = await Api.fetchJsrPkg({ scope: "nashaddams", pkg: "audit" });
 
-    assertObjectMatch(jsrPackage!, {
-      githubRepository: {
-        owner: "nashaddams",
-        name: "audit",
-      },
+    assertObjectMatch(pkg!, {
+      githubRepository: { owner: "nashaddams", name: "audit" },
     });
   });
 
   it("should return null for a non-existent JSR package", async () => {
-    const jsrPackage = await Api.fetchJsrPackage({
-      jsrScope: "nashaddams",
-      jsrPackage: "audittt",
-    });
+    const pkg = await Api.fetchJsrPkg({ scope: "nashaddams", pkg: "audittt" });
 
-    assertEquals(jsrPackage, null);
+    assertEquals(pkg, null);
+  });
+
+  it("should return null for an unlinked JSR package", async () => {
+    const fetchJsrPkgStub = stub(
+      Api,
+      "fetchJsrPkg",
+      async () => await Promise.resolve({ githubRepository: null }),
+    );
+
+    const pkg = await Api.fetchJsrPkg({ scope: "nashaddams", pkg: "audit" });
+
+    fetchJsrPkgStub.restore();
+
+    assertEquals(pkg!.githubRepository, null);
   });
 
   it("should fetch GitHub security advisories", async () => {
-    const advisories = await Api.fetchAdvisories({
-      jsrScope: "nashaddams",
-      jsrPackage: "audit",
+    const advisories = await Api.fetchGitHubAdvisories({
+      owner: "nashaddams",
+      repo: "audit",
     });
 
     assertEquals(advisories, []);
   });
 
   it("should return null for a non-existent Github repository", async () => {
-    const fetchJsrPackageStub = stub(
-      Api,
-      "fetchJsrPackage",
-      async () =>
-        await Promise.resolve({ githubRepository: { name: "", owner: "" } }),
-    );
-
-    const advisories = await Api.fetchAdvisories({
-      jsrScope: "nashaddams",
-      jsrPackage: "audit",
+    const advisories = await Api.fetchGitHubAdvisories({
+      owner: "nashaddams",
+      repo: "audittt",
     });
-
-    fetchJsrPackageStub.restore();
 
     assertEquals(advisories, null);
   });

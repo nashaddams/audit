@@ -4,20 +4,27 @@ import { assertSnapshot } from "@std/testing/snapshot";
 import { audit } from "../mod.ts";
 import { Api } from "../src/api.ts";
 import { Cmd } from "../src/cmd.ts";
+import { jsrPkg } from "./mock/jsr-package.ts";
 import { githubAdvisories } from "./mock/github-advisories.ts";
 import { npmAuditAll } from "./mock/npm-audit-all.ts";
 import { npmAuditNpmOnly } from "./mock/npm-audit-npm-only.ts";
 import { npmAuditEsmOnly } from "./mock/npm-audit-esm-only.ts";
 
 describe("audit", () => {
-  let fetchAdvisoriesStub: Stub | undefined = undefined;
+  let fetchJsrPkgStub: Stub | undefined = undefined;
+  let fetchGitHubAdvisoriesStub: Stub | undefined = undefined;
   let npmInstallStub: Stub | undefined = undefined;
   let npmAuditStub: Stub | undefined = undefined;
 
   beforeEach(() => {
-    fetchAdvisoriesStub = stub(
+    fetchJsrPkgStub = stub(
       Api,
-      "fetchAdvisories",
+      "fetchJsrPkg",
+      async () => await Promise.resolve(jsrPkg),
+    );
+    fetchGitHubAdvisoriesStub = stub(
+      Api,
+      "fetchGitHubAdvisories",
       async () => await Promise.resolve(githubAdvisories),
     );
     npmInstallStub = stub(
@@ -28,8 +35,11 @@ describe("audit", () => {
   });
 
   afterEach(() => {
-    if (fetchAdvisoriesStub && !fetchAdvisoriesStub.restored) {
-      fetchAdvisoriesStub.restore();
+    if (fetchJsrPkgStub && !fetchJsrPkgStub.restored) {
+      fetchJsrPkgStub.restore();
+    }
+    if (fetchGitHubAdvisoriesStub && !fetchGitHubAdvisoriesStub.restored) {
+      fetchGitHubAdvisoriesStub.restore();
     }
     if (npmInstallStub && !npmInstallStub.restored) {
       npmInstallStub.restore();
