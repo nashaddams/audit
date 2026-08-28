@@ -2,7 +2,7 @@ import { assertEquals } from "@std/assert";
 import { afterEach, beforeEach, describe, it } from "@std/testing/bdd";
 import DenoLockResolver from "../../src/resolver/deno-lock.ts";
 
-describe("[resolver] deno_lock", () => {
+describe("[resolver] deno-lock", () => {
   let tmpLockFile: string | undefined = undefined;
 
   beforeEach(() => {
