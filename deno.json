@@ -1,6 +1,6 @@
 {
   "name": "@nashaddams/audit",
-  "version": "0.22.3",
+  "version": "0.22.4",
   "license": "MIT",
   "exports": "./mod.ts",
   "imports": {
@@ -30,7 +30,9 @@
     "doc": "deno doc --html mod.ts && deno doc --lint mod.ts",
     "doc:report": {
       "command": "deno eval \"import { serveDir } from 'jsr:@std/http/file-server'; Deno.serve((req: Request) => serveDir(req, { fsRoot: 'docs' }));\"",
-      "dependencies": ["doc"]
+      "dependencies": [
+        "doc"
+      ]
     }
   },
   "publish": {

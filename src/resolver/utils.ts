@@ -65,6 +65,7 @@ export const inferOwnerAndRepoFromGithubUrl = (url?: string) => {
     .replace("github.com/", "")
     .replace(".git#main", "")
     .replace(".git", "")
+    .replace("github:", "")
     .split(
       "/",
     ) ?? [undefined, undefined];

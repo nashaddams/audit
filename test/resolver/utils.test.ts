@@ -48,5 +48,10 @@ describe("[resolver] utils", () => {
       "git+https://github.com/micromark/micromark.git#main",
     );
     assertEquals(main, { owner: "micromark", repo: "micromark" });
+
+    const github = inferOwnerAndRepoFromGithubUrl(
+      "github:moment/moment",
+    );
+    assertEquals(github, { owner: "moment", repo: "moment" });
   });
 });
