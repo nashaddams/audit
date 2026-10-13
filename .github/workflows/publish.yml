@@ -1,8 +1,9 @@
 name: publish
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  workflow_dispatch:
+    branches: [main]
 jobs:
   publish:
     runs-on: ubuntu-latest
